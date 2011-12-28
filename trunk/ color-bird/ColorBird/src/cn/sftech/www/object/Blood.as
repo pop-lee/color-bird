@@ -3,12 +3,11 @@ package cn.sftech.www.object
 	import cn.sftech.www.view.SFMovieClip;
 	
 	import flash.display.MovieClip;
-	import flash.events.Event;
 	
-	public class Bird extends SFMovieClip
+	public class Blood extends SFMovieClip
 	{
 		/**
-		 * 鸟的颜色
+		 * 颜色
 		 * 0代表 红色
 		 * 1代表 黄色
 		 * 2代表 蓝色
@@ -17,7 +16,7 @@ package cn.sftech.www.object
 		
 		private var _body : MovieClip;
 		
-		public function Bird()
+		public function Blood()
 		{
 			super();
 			color = 0;
@@ -32,29 +31,22 @@ package cn.sftech.www.object
 			
 			switch(value) {
 				case 0:{
-					_body = new RedBird();
+					_body = new RedBlood;
 				};break;
 				case 1:{
-					_body = new YellowBird();
+					_body = new YellowBlood();
 				};break;
 				case 2:{
-					_body = new BlueBird();
+					_body = new BlueBlood();
 				}
 			}
 			
 			addChild(_body);
 		}
+		
 		public function get color() : uint
 		{
 			return _color;
 		}
-		
-		public function hurt() : void
-		{
-			_body.gotoAndPlay(3);
-		}
-		
-		//----------------Event Handle--------------------
-		
 	}
 }
