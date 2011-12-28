@@ -4,6 +4,8 @@ package cn.sftech.www.view
 	import cn.sftech.www.model.GameConfig;
 	import cn.sftech.www.object.Bird;
 	import cn.sftech.www.object.Bullet;
+	import cn.sftech.www.object.BulletBase;
+	import cn.sftech.www.object.Coin;
 	import cn.sftech.www.object.Nimbus;
 	import cn.sftech.www.util.MathUtil;
 	
@@ -26,6 +28,16 @@ package cn.sftech.www.view
 		 * 当前关数
 		 */		
 		private var _currentLv : uint = 0;
+		
+		/**
+		 * 当前血量
+		 */		
+		private var _currentBlood : uint = 0;
+		
+		/**
+		 * 当前分数
+		 */		
+		private var _currentScore : uint = 0;
 		
 		public function GamePane()
 		{
@@ -56,6 +68,7 @@ package cn.sftech.www.view
 		{
 			_currentBulletCount = GameConfig.BULLET_COUNT * _currentLv / 2;
 			createBullet();
+			createCoin();
 		}
 		
 		private function successLv() : void
@@ -75,14 +88,35 @@ package cn.sftech.www.view
 				bullet.x = this.width + bullet.width;
 			}
 			bullet.y = MathUtil.random(0,this.height);
-			bullet.tanValue = (400 - bullet.x)/(240 - bullet.y);
+			bullet.ctanValue = (240 - bullet.y)/(400 - bullet.x);
 			bullet.angle = getAngle(bullet.x,bullet.y);
-			bullet.velocity = Math.random() + 1;
+			bullet.velocity = Math.random()*10;
 			bullet.addEventListener(KillBulletEvent.KILL_BULLET_EVENT,killBullet);
 			bullet.addEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 			addChild(bullet);
 			_currentBulletCount --;
 			setTimeout(createBullet,GameConfig.BULLET_TIMER);
+		}
+		
+		private function createCoin() : void
+		{
+			if(_currentBulletCount == 0) return;
+			//临时标记正负
+			var tempFlag : uint = MathUtil.random(0,2);
+			var coin : Coin = new Coin();
+			if(tempFlag == 0) {
+				coin.x = -coin.width;
+			} else {
+				coin.x = this.width + coin.width;
+			}
+			coin.y = MathUtil.random(0,this.height);
+			coin.ctanValue = (240 - coin.y)/(400 - coin.x);
+			coin.angle = getAngle(coin.x,coin.y);
+			coin.velocity = Math.random()*10;
+			coin.addEventListener(KillBulletEvent.KILL_BULLET_EVENT,killBullet);
+			coin.addEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
+			addChild(coin);
+			setTimeout(createCoin,MathUtil.random(2,5)*1000);
 		}
 		
 		private function getAngle(valueX : Number,valueY : Number) : Number
@@ -126,13 +160,24 @@ package cn.sftech.www.view
 		
 		private function bulletEnterFrameHandle(event : Event) : void
 		{
-			var bullet : Bullet = event.target as Bullet;
-			bullet.x += bullet.moveX;
-			bullet.y += bullet.moveY;
+			var bullet : BulletBase = event.target as BulletBase;
+			trace(bullet.moveX + "    " + bullet.moveY);
+			bullet.x += bullet.moveX*bullet.velocity;
+			bullet.y += bullet.moveY*bullet.velocity;
 			
 			if(bullet.hitTestObject(bird)) {
+				if(bullet is Coin) {
+					_currentScore += GameConfig.COIN_SCORE;
+				} else {
+					_currentBlood --;
+				}
+				bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 				bullet.killMyself();
 			} else if(bullet.hitTestObject(nimbus)) {
+				if(bullet is Coin) {
+					_currentScore += GameConfig.BULLET_SCORE;
+				}
+				bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 				bullet.killMyself();
 			}
 			
@@ -140,8 +185,7 @@ package cn.sftech.www.view
 		
 		private function killBullet(event : KillBulletEvent) : void
 		{
-			var bullet : Bullet = event.target as Bullet;
-			bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
+			var bullet : BulletBase = event.target as BulletBase;
 			removeChild(bullet);
 			bullet = null;
 			

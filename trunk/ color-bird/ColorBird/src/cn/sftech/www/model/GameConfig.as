@@ -19,7 +19,7 @@ package cn.sftech.www.model
 		/**
 		 * 子弹每关数量基数
 		 */		
-		public static const BULLET_COUNT : uint = 2;
+		public static const BULLET_COUNT : uint = 10;
 		/**
 		 * 子弹速度
 		 */		
@@ -33,6 +33,15 @@ package cn.sftech.www.model
 		 * 每相隔毫秒数创建子弹
 		 */		
 		public static const BULLET_TIMER : uint = 2000;
+		
+		/**
+		 * 挡掉子弹得分
+		 */		
+		public static const BULLET_SCORE : uint = 100;
+		/**
+		 * 挡掉钱币得分
+		 */		
+		public static const COIN_SCORE : uint = 500;
 		
 		public function GameConfig()
 		{
