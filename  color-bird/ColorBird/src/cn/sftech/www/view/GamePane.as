@@ -3,12 +3,16 @@ package cn.sftech.www.view
 	import cn.sftech.www.event.KillBulletEvent;
 	import cn.sftech.www.model.GameConfig;
 	import cn.sftech.www.object.Bird;
+	import cn.sftech.www.object.Blood;
 	import cn.sftech.www.object.Bullet;
 	import cn.sftech.www.object.BulletBase;
 	import cn.sftech.www.object.Coin;
 	import cn.sftech.www.object.Nimbus;
 	import cn.sftech.www.util.MathUtil;
+	import cn.sftech.www.util.NumberImage;
 	
+	import flash.display.Bitmap;
+	import flash.display.MovieClip;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.system.System;
@@ -19,6 +23,14 @@ package cn.sftech.www.view
 		private var bird : Bird;
 		
 		private var nimbus : Nimbus;
+		
+		private var scoreBar : ScoreBar;
+		
+		private var blood : Blood;
+		
+		private var menuBtn : MenuBtn;
+		
+		private var scoreNum : SFContainer;
 		
 		/**
 		 * 当前关子剩余子弹数
@@ -39,6 +51,8 @@ package cn.sftech.www.view
 		 */		
 		private var _currentScore : uint = 0;
 		
+		private var mouseDownFlag : Boolean = false;
+		
 		public function GamePane()
 		{
 			super();
@@ -58,7 +72,30 @@ package cn.sftech.www.view
 			nimbus.y = this.height/2;
 			addChild(nimbus);
 			
-			this.addEventListener(MouseEvent.MOUSE_DOWN,mouseDownHandle);
+			scoreBar = new ScoreBar();
+			scoreBar.x = 570;
+			scoreBar.y = 8;
+			addChild(scoreBar);
+			scoreNum = new SFContainer();
+			scoreNum.backgroundAlpha = 0;
+			scoreNum.width = 100;
+			scoreNum.height = 20;
+			scoreNum.x = 90;
+			scoreNum.y = 15;
+			scoreBar.addChild(scoreNum);
+			
+			blood = new Blood();
+			blood.x = 55;
+			blood.y = 425;
+			blood.addEventListener(MouseEvent.CLICK,changeColorHandle);
+			addChild(blood);
+			
+			menuBtn = new MenuBtn();
+			menuBtn.x = 725;
+			menuBtn.y = 405;
+			addChild(menuBtn);
+			
+			this.addEventListener(MouseEvent.MOUSE_DOWN,mouseDownNimbusHandle);
 			
 			_currentLv = 1;
 			initLv();
@@ -69,6 +106,25 @@ package cn.sftech.www.view
 			_currentBulletCount = GameConfig.BULLET_COUNT * _currentLv / 2;
 			createBullet();
 			createCoin();
+		}
+		
+		private function set currentScore(value : uint) : void
+		{
+			_currentScore = value
+			while(scoreNum.numChildren>0) {
+				scoreNum.removeChildAt(0);
+			}
+			
+			var numImage : NumberImage = new NumberImage();
+			numImage.charWidth = numImage.charHeight = 20;
+			numImage.imageData = ScoreNumber;
+			var scoreImage : Bitmap = numImage.getNumberImage(value);
+			scoreImage.x = (scoreNum.width - scoreImage.width)/2;
+			scoreNum.addChild(scoreImage);
+		}
+		private function get currentScore() : uint
+		{
+			return _currentScore;
 		}
 		
 		private function successLv() : void
@@ -90,7 +146,7 @@ package cn.sftech.www.view
 			bullet.y = MathUtil.random(0,this.height);
 			bullet.ctanValue = (240 - bullet.y)/(400 - bullet.x);
 			bullet.angle = getAngle(bullet.x,bullet.y);
-			bullet.velocity = Math.random()*10;
+			bullet.velocity = MathUtil.random(5,8);
 			bullet.addEventListener(KillBulletEvent.KILL_BULLET_EVENT,killBullet);
 			bullet.addEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 			addChild(bullet);
@@ -141,21 +197,45 @@ package cn.sftech.www.view
 		}
 		
 		//-----------------mouse event ---------------------
-		private function mouseDownHandle(event : MouseEvent) : void
+		private function mouseDownNimbusHandle(event : MouseEvent) : void
 		{
-			this.addEventListener(MouseEvent.MOUSE_MOVE,mouseMoveHandle);
-			this.addEventListener(MouseEvent.MOUSE_UP,mouseUpHandle);
+			if(bird.hitTestPoint(this.mouseX,this.mouseY,true)) {
+				mouseDownFlag = true;
+			}
+			this.addEventListener(MouseEvent.MOUSE_MOVE,mouseMoveNimbusHandle);
+			this.addEventListener(MouseEvent.MOUSE_UP,mouseUpNimbusHandle);
 		}
 		
-		private function mouseMoveHandle(event : MouseEvent) : void
+		private function mouseMoveNimbusHandle(event : MouseEvent) : void
 		{
-			nimbus.rotation = getAngle(this.mouseX,this.mouseY) + 180;
-			
+			if(!bird.hitTestPoint(this.mouseX,this.mouseY,true)) {
+				nimbus.rotation = getAngle(this.mouseX,this.mouseY) + 180;
+			} else {
+				trace("abc");
+			}
 		}
 		
-		private function mouseUpHandle(event : MouseEvent) : void
+		private function mouseUpNimbusHandle(event : MouseEvent) : void
 		{
-			this.removeEventListener(MouseEvent.MOUSE_MOVE,mouseMoveHandle);
+			if(mouseDownFlag) {
+				changeColorHandle();
+				mouseDownFlag = false;
+			}
+			this.removeEventListener(MouseEvent.MOUSE_MOVE,mouseMoveNimbusHandle);
+		}
+		/**
+		 * 变换颜色的操作
+		 * 
+		 */		
+		private function changeColorHandle(event : MouseEvent = null) : void
+		{
+			var color : uint = bird.color;
+			if(color == 2) {
+				color = 0;
+			} else {
+				color ++;
+			}
+			nimbus.color = blood.color = bird.color = color;
 		}
 		
 		private function bulletEnterFrameHandle(event : Event) : void
@@ -167,18 +247,25 @@ package cn.sftech.www.view
 			
 			if(bullet.hitTestObject(bird)) {
 				if(bullet is Coin) {
-					_currentScore += GameConfig.COIN_SCORE;
+					currentScore += GameConfig.COIN_SCORE;
 				} else {
+					bird.hurt();
 					_currentBlood --;
 				}
 				bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 				bullet.killMyself();
 			} else if(bullet.hitTestObject(nimbus)) {
 				if(bullet is Coin) {
-					_currentScore += GameConfig.BULLET_SCORE;
-				}
-				bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
-				bullet.killMyself();
+					bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
+					bullet.killMyself();
+				} else {
+					var _bullet : Bullet = bullet as Bullet;
+					if(_bullet.color == nimbus.color) {
+						currentScore += GameConfig.BULLET_SCORE;
+						bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
+						bullet.killMyself();
+					}
+				} 
 			}
 			
 		}
