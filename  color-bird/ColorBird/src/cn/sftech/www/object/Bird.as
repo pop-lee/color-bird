@@ -51,7 +51,7 @@ package cn.sftech.www.object
 		
 		public function hurt() : void
 		{
-			_body.gotoAndPlay(3);
+			_body.gotoAndPlay(4);
 		}
 		
 		//----------------Event Handle--------------------

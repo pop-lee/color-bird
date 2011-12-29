@@ -25,7 +25,10 @@ package cn.sftech.www.object
 		public function set color(value : uint) : void
 		{
 			_color = value;
+			
+			
 			if(_body) {
+				var _bodyFrame : int = _body.currentFrame;
 				removeChild(_body);
 			}
 			
@@ -41,12 +44,19 @@ package cn.sftech.www.object
 				}
 			}
 			
+			_body.gotoAndStop(_bodyFrame);
+			
 			addChild(_body);
 		}
 		
 		public function get color() : uint
 		{
 			return _color;
+		}
+		
+		public function hurt() : void
+		{
+			_body.nextFrame();
 		}
 	}
 }

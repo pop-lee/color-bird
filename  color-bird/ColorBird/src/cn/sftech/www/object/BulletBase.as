@@ -3,6 +3,7 @@ package cn.sftech.www.object
 	import cn.sftech.www.event.KillBulletEvent;
 	import cn.sftech.www.view.SFMovieClip;
 	
+	import flash.display.Bitmap;
 	import flash.display.MovieClip;
 	import flash.events.Event;
 	
@@ -25,6 +26,8 @@ package cn.sftech.www.object
 		 * 角度
 		 */		
 		private var _angle : Number;
+		
+		public var bitmap : Bitmap;
 		
 //		/**
 //		 * 象限区域
@@ -79,6 +82,11 @@ package cn.sftech.www.object
 			
 		}
 		
+		public function get core() : MovieClip
+		{
+			return _body.core;
+		}
+		
 //		public function set quadrant(value : uint) : void
 //		{
 //			_quadrant = value;
@@ -99,7 +107,7 @@ package cn.sftech.www.object
 						_body.parent.dispatchEvent(new KillBulletEvent());
 						return;
 					}
-					_body.nextFrame();
+//					_body.nextFrame();
 				});
 		}
 	}
