@@ -77,6 +77,7 @@ package cn.sftech.www.view
 			nimbus.x = this.width/2;
 			nimbus.y = this.height/2;
 			addChild(nimbus);
+			addChild(nimbus.bitmap);
 			
 			scoreBar = new ScoreBar();
 			scoreBar.x = 570;
@@ -176,19 +177,22 @@ package cn.sftech.www.view
 			//临时标记正负
 			var tempFlag : uint = MathUtil.random(0,2);
 			var bullet : Bullet = new Bullet();
-			if(tempFlag == 0) {
-				bullet.x = -bullet.width;
-			} else {
-				bullet.x = this.width + bullet.width;
-			}
-			bullet.y = MathUtil.random(0,this.height);
+//			if(tempFlag == 0) {
+//				bullet.x = -bullet.width;
+//			} else {
+//				bullet.x = this.width + bullet.width;
+//			}
+//			bullet.y = MathUtil.random(0,this.height);
+			bullet.x = 25;
+			bullet.y = 25;
 			bullet.color = MathUtil.random(0,3);
 			bullet.ctanValue = (240 - bullet.y)/(400 - bullet.x);
 			bullet.angle = getAngle(bullet.x,bullet.y);
 			bullet.velocity = MathUtil.random(5,8);
 			bullet.addEventListener(KillBulletEvent.KILL_BULLET_EVENT,killBullet);
-			bullet.addEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
+//			bullet.addEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 			addChild(bullet);
+			addChild(bullet.bitmap);
 			bulletCount ++;
 			_currentBulletCount --;
 			setTimeout(createBullet,GameConfig.BULLET_TIMER);
@@ -212,6 +216,7 @@ package cn.sftech.www.view
 			coin.addEventListener(KillBulletEvent.KILL_BULLET_EVENT,killBullet);
 			coin.addEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 			addChild(coin);
+			addChild(coin.bitmap);
 			bulletCount ++;
 			setTimeout(createCoin,MathUtil.random(2,5)*1000);
 		}
@@ -295,9 +300,9 @@ package cn.sftech.www.view
 				bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 				bullet.killMyself();
 			} else if(bullet.bitmap.bitmapData.hitTest(
-				new Point(bullet.x,bullet.y),255,
+				new Point(bullet.x-bullet.width/2,bullet.y-bullet.height/2),255,
 				nimbus.bitmap.bitmapData,
-				new Point(nimbus.x,nimbus.y),255)) {
+				new Point(nimbus.x-nimbus.width/2,nimbus.y-nimbus.height),255)) {
 				if(bullet is Coin) {
 					bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 					bullet.killMyself();
