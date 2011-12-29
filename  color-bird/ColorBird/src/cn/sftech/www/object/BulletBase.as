@@ -27,7 +27,7 @@ package cn.sftech.www.object
 		 */		
 		private var _angle : Number;
 		
-		public var bitmap : Bitmap;
+		public var bitmap : Bitmap = new Bitmap();
 		
 //		/**
 //		 * 象限区域

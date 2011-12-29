@@ -8,6 +8,7 @@ package cn.sftech.www.object
 	import flash.display.BitmapData;
 	import flash.display.MovieClip;
 	import flash.events.Event;
+	import flash.geom.Matrix;
 	
 	public class Bullet extends BulletBase
 	{
@@ -25,11 +26,25 @@ package cn.sftech.www.object
 			color = 0;
 		}
 		
+		override public function set x(value:Number):void
+		{
+			super.x = value;
+			
+			bitmap.x = value -bitmap.width/2;
+		}
+		
+		override public function set y(value:Number):void
+		{
+			super.y = value;
+			
+			bitmap.y = value -bitmap.height/2;
+		}
+		
 		public function set color(value : uint) : void
 		{
 			_color = value;
-			if(bitmap) {
-				removeChild(bitmap);
+			if(_body) {
+				removeChild(_body);
 			}
 			
 			switch(value) {
@@ -45,10 +60,10 @@ package cn.sftech.www.object
 			}
 			
 			var bitmapData : BitmapData = new BitmapData(_body.width, _body.height, true,0x00000000);
-			bitmapData.draw(_body);
-			bitmap = new Bitmap(bitmapData);
+			bitmapData.draw(_body,new Matrix(1,0,0,1,bitmapData.width/2,bitmapData.height/2));
+			bitmap.bitmapData = bitmapData;
 			
-			addChild(bitmap);
+			addChild(_body);
 		}
 		public function get color() : uint
 		{
