@@ -4,6 +4,8 @@ package cn.sftech.www.object
 	import cn.sftech.www.model.GameConfig;
 	import cn.sftech.www.view.SFMovieClip;
 	
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
 	import flash.display.MovieClip;
 	import flash.events.Event;
 	
@@ -26,13 +28,13 @@ package cn.sftech.www.object
 		public function set color(value : uint) : void
 		{
 			_color = value;
-			if(_body) {
-				removeChild(_body);
+			if(bitmap) {
+				removeChild(bitmap);
 			}
 			
 			switch(value) {
 				case 0:{
-					_body = new RedBullet;
+					_body = new RedBullet();
 				};break;
 				case 1:{
 					_body = new YellowBullet();
@@ -42,7 +44,11 @@ package cn.sftech.www.object
 				}
 			}
 			
-			addChild(_body);
+			var bitmapData : BitmapData = new BitmapData(_body.width, _body.height, true,0x00000000);
+			bitmapData.draw(_body);
+			bitmap = new Bitmap(bitmapData);
+			
+			addChild(bitmap);
 		}
 		public function get color() : uint
 		{

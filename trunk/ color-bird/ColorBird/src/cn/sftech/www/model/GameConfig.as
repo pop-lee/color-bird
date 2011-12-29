@@ -19,7 +19,7 @@ package cn.sftech.www.model
 		/**
 		 * 子弹每关数量基数
 		 */		
-		public static const BULLET_COUNT : uint = 10;
+		public static const BULLET_COUNT : uint = 2;
 		/**
 		 * 子弹速度
 		 */		
