@@ -26,20 +26,6 @@ package cn.sftech.www.object
 			color = 0;
 		}
 		
-		override public function set x(value:Number):void
-		{
-			super.x = value;
-			
-			bitmap.x = value -bitmap.width/2;
-		}
-		
-		override public function set y(value:Number):void
-		{
-			super.y = value;
-			
-			bitmap.y = value -bitmap.height/2;
-		}
-		
 		public function set color(value : uint) : void
 		{
 			_color = value;
@@ -58,10 +44,6 @@ package cn.sftech.www.object
 					_body = new BlueBullet();
 				}
 			}
-			
-			var bitmapData : BitmapData = new BitmapData(_body.width, _body.height, true,0x00000000);
-			bitmapData.draw(_body,new Matrix(1,0,0,1,bitmapData.width/2,bitmapData.height/2));
-			bitmap.bitmapData = bitmapData;
 			
 			addChild(_body);
 		}

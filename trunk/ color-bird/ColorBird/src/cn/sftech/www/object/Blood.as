@@ -54,6 +54,11 @@ package cn.sftech.www.object
 			return _color;
 		}
 		
+		public function reBack() : void
+		{
+			_body.gotoAndStop(1);
+		}
+		
 		public function hurt() : void
 		{
 			_body.nextFrame();

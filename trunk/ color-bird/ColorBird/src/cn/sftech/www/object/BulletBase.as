@@ -27,8 +27,6 @@ package cn.sftech.www.object
 		 */		
 		private var _angle : Number;
 		
-		public var bitmap : Bitmap = new Bitmap();
-		
 //		/**
 //		 * 象限区域
 //		 */		
@@ -82,11 +80,6 @@ package cn.sftech.www.object
 			
 		}
 		
-		public function get core() : MovieClip
-		{
-			return _body.core;
-		}
-		
 //		public function set quadrant(value : uint) : void
 //		{
 //			_quadrant = value;
@@ -107,7 +100,7 @@ package cn.sftech.www.object
 						_body.parent.dispatchEvent(new KillBulletEvent());
 						return;
 					}
-//					_body.nextFrame();
+					_body.nextFrame();
 				});
 		}
 	}

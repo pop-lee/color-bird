@@ -1,15 +1,24 @@
 package cn.sftech.www.view
 {
+	import cn.sftech.www.effect.SFMoveEffect;
+	import cn.sftech.www.effect.base.SFEffectBase;
+	import cn.sftech.www.event.GameOverEvent;
+	import cn.sftech.www.event.GameSuccessEvent;
 	import cn.sftech.www.event.KillBulletEvent;
 	import cn.sftech.www.model.GameConfig;
+	import cn.sftech.www.model.ModelLocator;
 	import cn.sftech.www.object.Bird;
 	import cn.sftech.www.object.Blood;
 	import cn.sftech.www.object.Bullet;
 	import cn.sftech.www.object.BulletBase;
 	import cn.sftech.www.object.Coin;
 	import cn.sftech.www.object.Nimbus;
+	import cn.sftech.www.util.DataManager;
 	import cn.sftech.www.util.MathUtil;
 	import cn.sftech.www.util.NumberImage;
+	
+	import com.greensock.data.TweenLiteVars;
+	import com.greensock.easing.Expo;
 	
 	import flash.display.Bitmap;
 	import flash.display.MovieClip;
@@ -33,24 +42,19 @@ package cn.sftech.www.view
 		
 		private var scoreNum : SFContainer;
 		
+		private var _model : ModelLocator = ModelLocator.getInstance();
+		
 		/**
 		 * 当前关子剩余子弹数
 		 */		
 		private var _currentBulletCount : uint = 0;
-		/**
-		 * 当前关数
-		 */		
-		private var _currentLv : uint = 0;
 		
 		/**
 		 * 当前血量
 		 */		
 		private var _currentBlood : int = 0;
 		
-		/**
-		 * 当前分数
-		 */		
-		private var _currentScore : uint = 0;
+		private var _currentNimbusAngle : int = 180;
 		
 		/**
 		 * 当前界面上剩余未销毁子弹数
@@ -58,6 +62,8 @@ package cn.sftech.www.view
 		private var _bulletCount : int = 0;
 		
 		private var mouseDownFlag : Boolean = false;
+		
+		private var birdEffect : SFEffectBase = new SFEffectBase();;
 		
 		public function GamePane()
 		{
@@ -74,10 +80,9 @@ package cn.sftech.www.view
 			addChild(bird);
 			
 			nimbus = new Nimbus();
-			nimbus.x = this.width/2;
-			nimbus.y = this.height/2;
-			addChild(nimbus);
-			addChild(nimbus.bitmap);
+//			nimbus.x = this.width/2;
+//			nimbus.y = this.height/2;
+			bird.addChild(nimbus);
 			
 			scoreBar = new ScoreBar();
 			scoreBar.x = 570;
@@ -105,20 +110,40 @@ package cn.sftech.www.view
 			this.addEventListener(MouseEvent.MOUSE_DOWN,mouseDownNimbusHandle);
 			
 			currentBlood = 3;
-			_currentLv = 1;
-			initLv();
+			currentScore = 0;
+			_model.currentLv = 1;
+			
+			this.dispatchEvent(new GameSuccessEvent());
 		}
 		
-		private function initLv() : void
+		public function initLv() : void
 		{
-			_currentBulletCount = GameConfig.BULLET_COUNT * _currentLv / 2;
+			_currentBulletCount = GameConfig.BULLET_COUNT * _model.currentLv / 2;
 			createBullet();
 			createCoin();
 		}
 		
+		public function restartGame() : void
+		{
+			_model.currentLv = 1;
+			currentBlood = 3;
+			currentScore = 0;
+			blood.reBack();
+			
+			birdEffect.target = bird;
+			birdEffect.duration = 1;
+			birdEffect.vars = new TweenLiteVars();
+			birdEffect.vars.prop("y",240);
+			birdEffect.vars.prop("rotation",0);
+			birdEffect.vars.ease(Expo.easeIn);
+			birdEffect.play();
+			
+			initLv();
+		}
+		
 		private function set currentScore(value : uint) : void
 		{
-			_currentScore = value
+			_model.currentScore = value
 			while(scoreNum.numChildren>0) {
 				scoreNum.removeChildAt(0);
 			}
@@ -132,7 +157,7 @@ package cn.sftech.www.view
 		}
 		private function get currentScore() : uint
 		{
-			return _currentScore;
+			return _model.currentScore;
 		}
 		
 		private function set currentBlood(value : int) : void
@@ -163,12 +188,26 @@ package cn.sftech.www.view
 		
 		private function gameOver() : void
 		{
+			this.dispatchEvent(new GameOverEvent());
+			
+			birdEffect.target = bird;
+			birdEffect.duration = 1;
+			birdEffect.vars = new TweenLiteVars();
+			birdEffect.vars.prop("y",this.height + 100);
+			birdEffect.vars.prop("rotation",MathUtil.random(30,50));
+			birdEffect.vars.ease(Expo.easeIn);
+			birdEffect.play();
+			
+			var dataManager : DataManager = new DataManager();
+			dataManager.saveScore();
+			
 			trace("gameOver");
 		}
 		
 		private function successLv() : void
 		{
-			trace("success");
+			_model.currentLv ++;
+			this.dispatchEvent(new GameSuccessEvent());
 		}
 		
 		private function createBullet() : void
@@ -177,22 +216,20 @@ package cn.sftech.www.view
 			//临时标记正负
 			var tempFlag : uint = MathUtil.random(0,2);
 			var bullet : Bullet = new Bullet();
-//			if(tempFlag == 0) {
-//				bullet.x = -bullet.width;
-//			} else {
-//				bullet.x = this.width + bullet.width;
-//			}
-//			bullet.y = MathUtil.random(0,this.height);
-			bullet.x = 25;
-			bullet.y = 25;
+			if(tempFlag == 0) {
+				bullet.x = -bullet.width;
+			} else {
+				bullet.x = this.width + bullet.width;
+			}
+			bullet.y = MathUtil.random(0,this.height);
 			bullet.color = MathUtil.random(0,3);
 			bullet.ctanValue = (240 - bullet.y)/(400 - bullet.x);
 			bullet.angle = getAngle(bullet.x,bullet.y);
 			bullet.velocity = MathUtil.random(5,8);
 			bullet.addEventListener(KillBulletEvent.KILL_BULLET_EVENT,killBullet);
-//			bullet.addEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
+			bullet.addEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 			addChild(bullet);
-			addChild(bullet.bitmap);
+
 			bulletCount ++;
 			_currentBulletCount --;
 			setTimeout(createBullet,GameConfig.BULLET_TIMER);
@@ -216,9 +253,8 @@ package cn.sftech.www.view
 			coin.addEventListener(KillBulletEvent.KILL_BULLET_EVENT,killBullet);
 			coin.addEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 			addChild(coin);
-			addChild(coin.bitmap);
 			bulletCount ++;
-			setTimeout(createCoin,MathUtil.random(2,5)*1000);
+			setTimeout(createCoin,MathUtil.random(4,8)*1000);
 		}
 		
 		private function getAngle(valueX : Number,valueY : Number) : Number
@@ -255,7 +291,9 @@ package cn.sftech.www.view
 		private function mouseMoveNimbusHandle(event : MouseEvent) : void
 		{
 			if(!bird.hitTestPoint(this.mouseX,this.mouseY,true)) {
-				nimbus.rotation = getAngle(this.mouseX,this.mouseY) + 180;
+				_currentNimbusAngle = getAngle(this.mouseX,this.mouseY);
+				_currentNimbusAngle += _currentNimbusAngle>0?-180:180;
+				nimbus.rotation = _currentNimbusAngle;
 			}
 		}
 		
@@ -289,7 +327,7 @@ package cn.sftech.www.view
 			bullet.x += bullet.moveX*bullet.velocity;
 			bullet.y += bullet.moveY*bullet.velocity;
 			
-			if(bullet.core.hitTestObject(bird)) {
+			if(bullet.hitTestObject(bird.core)) {
 				if(bullet is Coin) {
 					currentScore += GameConfig.COIN_SCORE;
 				} else {
@@ -299,21 +337,28 @@ package cn.sftech.www.view
 				}
 				bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 				bullet.killMyself();
-			} else if(bullet.bitmap.bitmapData.hitTest(
-				new Point(bullet.x-bullet.width/2,bullet.y-bullet.height/2),255,
-				nimbus.bitmap.bitmapData,
-				new Point(nimbus.x-nimbus.width/2,nimbus.y-nimbus.height),255)) {
-				if(bullet is Coin) {
-					bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
-					bullet.killMyself();
-				} else {
-					var _bullet : Bullet = bullet as Bullet;
-					if(_bullet.color == nimbus.color) {
-						currentScore += GameConfig.BULLET_SCORE;
+			} else if(Point.distance(new Point(bullet.x ,bullet.y),new Point(bird.x,bird.y))<115) {
+				trace(getAngle(bullet.x,bullet.y));
+				if(getAngle(bullet.x,bullet.y) > _currentNimbusAngle - nimbus.sector/2 - 10 &&
+					getAngle(bullet.x,bullet.y) < _currentNimbusAngle + nimbus.sector/2 + 10) {
+					if(bullet is Coin) {
 						bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 						bullet.killMyself();
+					} else {
+						var _bullet : Bullet = bullet as Bullet;
+						if(_bullet.color == nimbus.color) {
+							currentScore += GameConfig.BULLET_SCORE;
+							bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
+							bullet.killMyself();
+						}
 					}
 				} 
+			}
+			
+			if(bullet.x<- 100 || bullet.x> this.width + 100 || bullet.y< 0 || bullet.y > this.height) {
+				bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
+				removeChild(bullet);
+				bullet = null;
 			}
 			
 		}
@@ -322,7 +367,7 @@ package cn.sftech.www.view
 		{
 			bulletCount --;
 			var bullet : BulletBase = event.target as BulletBase;
-//			removeChild(bullet);
+			removeChild(bullet);
 			bullet = null;
 			
 			System.gc();

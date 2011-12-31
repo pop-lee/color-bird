@@ -49,9 +49,14 @@ package cn.sftech.www.object
 			return _color;
 		}
 		
+		public function get core() : MovieClip
+		{
+			return _body.core;
+		}
+		
 		public function hurt() : void
 		{
-			_body.gotoAndPlay(4);
+			_body.gotoAndPlay(10);
 		}
 		
 		//----------------Event Handle--------------------
