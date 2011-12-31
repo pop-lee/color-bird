@@ -18,9 +18,7 @@ package cn.sftech.www.object
 		
 		private var _body : MovieClip;
 		
-		public var bitmap : Bitmap;
-		
-		private var matrix : Matrix = new Matrix();
+		public var sector : uint = 90;
 		
 		public function Nimbus()
 		{
@@ -28,40 +26,9 @@ package cn.sftech.www.object
 			color = 0;
 		}
 		
-		override public function set x(value:Number):void
-		{
-			super.x = value;
-			
-			bitmap.x = value -bitmap.width/2;
-		}
-		
-		override public function set y(value:Number):void
-		{
-			super.y = value;
-			
-			bitmap.y = value -bitmap.height;
-		}
-		
 		override public function set rotation(value:Number):void
 		{
 			super.rotation = value;
-			
-//			matrix.transformPoint(new Point(bitmap.width/2,
-			var bitmapData : BitmapData = new BitmapData(_body.width, _body.height, true,0x00000000);
-//			var bitmapData : BitmapData = bitmap.bitmapData;
-			var transformPoint : Point = new Point(bitmap.x + bitmap.width/2 - 10,bitmap.y + bitmap.height - 10);
-//			matrix = bitmap.transform.matrix;
-//			matrix.transformPoint(transformPoint);
-//			matrix.translate(-transformPoint.x,-transformPoint.y);
-//			matrix.rotate(value);
-//			matrix.translate(transformPoint.x,transformPoint.y);
-//			bitmap.transform.matrix = matrix;
-//			matrix.tx = bitmapData.width/2 + 10;
-//			matrix.ty = bitmapData.height + 10;
-//			bitmapData.draw(bitmapData);
-////			bitmapData.draw(_body,matrix);
-////			bitmap = new Bitmap(bitmapData);
-//			bitmap.rotation = value;
 			
 		}
 		
@@ -83,12 +50,6 @@ package cn.sftech.www.object
 					_body = new BlueNimbus();
 				}
 			}
-			
-			var bitmapData : BitmapData = new BitmapData(_body.width, _body.height, true,0x00000000);
-			matrix.tx = bitmapData.width/2;
-			matrix.ty = bitmapData.height;
-			bitmapData.draw(_body,matrix);
-			bitmap = new Bitmap(bitmapData);
 			
 			addChild(_body);
 		}
