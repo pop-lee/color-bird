@@ -4,6 +4,9 @@ package cn.sftech.www.object
 	
 	import flash.display.MovieClip;
 	import flash.events.Event;
+	import flash.events.TimerEvent;
+	import flash.filters.GlowFilter;
+	import flash.utils.Timer;
 	
 	public class Bird extends SFMovieClip
 	{
@@ -17,10 +20,17 @@ package cn.sftech.www.object
 		
 		private var _body : MovieClip;
 		
+		private var _isSuper : Boolean = false;
+		
 		public function Bird()
 		{
 			super();
-			color = 0;
+			init();
+		}
+		
+		private function init() : void
+		{
+			color = 1;
 		}
 		
 		public function set color(value : uint) : void
@@ -31,13 +41,13 @@ package cn.sftech.www.object
 			}
 			
 			switch(value) {
-				case 0:{
+				case 1:{
 					_body = new RedBird();
 				};break;
-				case 1:{
+				case 2:{
 					_body = new YellowBird();
 				};break;
-				case 2:{
+				case 3:{
 					_body = new BlueBird();
 				}
 			}
@@ -54,9 +64,16 @@ package cn.sftech.www.object
 			return _body.core;
 		}
 		
+		public function makeSuper() : void
+		{
+//			var timer : Timer = new Timer(200,10);
+			
+		}
+		
 		public function hurt() : void
 		{
 			_body.gotoAndPlay(10);
+			makeSuper();
 		}
 		
 		//----------------Event Handle--------------------

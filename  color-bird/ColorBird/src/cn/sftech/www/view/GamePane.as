@@ -6,6 +6,7 @@ package cn.sftech.www.view
 	import cn.sftech.www.event.GameSuccessEvent;
 	import cn.sftech.www.event.KillBulletEvent;
 	import cn.sftech.www.model.GameConfig;
+	import cn.sftech.www.model.LevelData;
 	import cn.sftech.www.model.ModelLocator;
 	import cn.sftech.www.object.Bird;
 	import cn.sftech.www.object.Blood;
@@ -19,6 +20,7 @@ package cn.sftech.www.view
 	
 	import com.greensock.data.TweenLiteVars;
 	import com.greensock.easing.Expo;
+	import com.greensock.easing.Linear;
 	
 	import flash.display.Bitmap;
 	import flash.display.MovieClip;
@@ -30,17 +32,40 @@ package cn.sftech.www.view
 
 	public class GamePane extends SFMovieClip
 	{
+		//------------界面部分--------------------------
+		/**
+		 * 卷轴面板
+		 */		
+		private var reel : SFContainer;
+		/**
+		 * 鸟
+		 */		
 		private var bird : Bird;
-		
+		/**
+		 * 保护罩
+		 */		
 		private var nimbus : Nimbus;
-		
+		/**
+		 * 分数条
+		 */		
 		private var scoreBar : ScoreBar;
-		
+		/**
+		 * 血量
+		 */		
 		private var blood : Blood;
-		
+		/**
+		 * 菜单按钮
+		 */		
 		private var menuBtn : MenuBtn;
-		
+		/**
+		 * 分数数字面板
+		 */		
 		private var scoreNum : SFContainer;
+		///////////////////////////////////////////////////////////////////
+		/**
+		 * 当前关卡数据
+		 */		
+		private var currentLvArr : Vector.<Object>;
 		
 		private var _model : ModelLocator = ModelLocator.getInstance();
 		
@@ -48,22 +73,58 @@ package cn.sftech.www.view
 		 * 当前关子剩余子弹数
 		 */		
 		private var _currentBulletCount : uint = 0;
+		/**
+		 * 子弹方向
+		 */		
+		private var _currentBatchQuadrant : uint = 0;
+		/**
+		 * 当前批次的颜色
+		 */		
+		private var _currentBatchColor : uint = 0;
+		/**
+		 * 当前批次速度
+		 */		
+		private var _currentBatchVelocity : uint = 0;
+		/**
+		 * 当前批次与上一批间隔创建时间（单位：毫秒）
+		 */		
+		private var _currentBatchTimer : uint = 0;
+		/**
+		 * 当前批次类型
+		 */		
+		private var _currentBatchType : Class;
+		
+		/**
+		 * 出现钱币锁
+		 */		
+		private var coinLock : Boolean = false;
+		
+		/**
+		 * 第一创建的颜色
+		 */		
+		private var _lastBatchColor : uint = 0;
+		
+		///////////////////////////////////////////////////////////////////////
 		
 		/**
 		 * 当前血量
 		 */		
 		private var _currentBlood : int = 0;
+		/**
+		 * 当前全局速度
+		 */		
+		private var _currentVelocity : uint = 1;
 		
 		private var _currentNimbusAngle : int = 180;
 		
 		/**
 		 * 当前界面上剩余未销毁子弹数
-		 */		
+		 */
 		private var _bulletCount : int = 0;
-		
+		// 标记鼠标是否按下
 		private var mouseDownFlag : Boolean = false;
-		
-		private var birdEffect : SFEffectBase = new SFEffectBase();;
+		// 游戏失败鸟的掉到屏幕下的效果
+		private var birdEffect : SFEffectBase = new SFEffectBase();
 		
 		public function GamePane()
 		{
@@ -72,14 +133,16 @@ package cn.sftech.www.view
 		
 		public function init() : void
 		{
-			this.backgroundImage = GamePaneBackground;
+			initUI();
 			
 			bird = new Bird();
-			bird.x = this.width/2;
-			bird.y = this.height/2;
+			bird.x = 400;
+			bird.y = 240;
+			bird.color = MathUtil.random(1,4);
 			addChild(bird);
 			
 			nimbus = new Nimbus();
+			nimbus.color = bird.color;
 //			nimbus.x = this.width/2;
 //			nimbus.y = this.height/2;
 			bird.addChild(nimbus);
@@ -109,18 +172,88 @@ package cn.sftech.www.view
 			
 			this.addEventListener(MouseEvent.MOUSE_DOWN,mouseDownNimbusHandle);
 			
-			currentBlood = 3;
-			currentScore = 0;
-			_model.currentLv = 1;
+			initData();
 			
 			this.dispatchEvent(new GameSuccessEvent());
 		}
 		
+		private function initData() : void
+		{
+			currentBlood = 10;
+			currentScore = 0;
+			_model.currentLv = 1;
+			_currentBatchQuadrant = MathUtil.random(1,5);
+			_currentBatchColor = bird.color;
+		}
+		
+		private function initUI() : void
+		{
+			reel = new SFContainer();
+			addChild(reel);
+			var background : GamePaneBackground = new GamePaneBackground();
+			reel.addChild(background);
+			
+			var reel2 : SFMovieClip = new SFMovieClip();
+			reel.addChild(reel2);
+			
+			var cloud2_1 : Cloud2 = new Cloud2();
+			var cloud2_2 : Cloud2 = new Cloud2();
+			cloud2_2.y = -cloud2_2.height;
+			reel2.addChild(cloud2_1);
+			reel2.addChild(cloud2_2);
+			
+//			cloud2_1.addEventListener(Event.ENTER_FRAME,could2EnterFrameHandle);
+//			cloud2_2.addEventListener(Event.ENTER_FRAME,could2EnterFrameHandle);
+			
+			var reel1 : SFMovieClip = new SFMovieClip();
+			reel.addChild(reel1);
+			
+			var cloud1_1 : Cloud1 = new Cloud1();
+			var cloud1_2 : Cloud1 = new Cloud1();
+			cloud1_2.y = -cloud1_2.height;
+			reel1.addChild(cloud1_1);
+			reel1.addChild(cloud1_2);
+			
+//			cloud1_1.addEventListener(Event.ENTER_FRAME,could1EnterFrameHandle);
+//			cloud1_2.addEventListener(Event.ENTER_FRAME,could1EnterFrameHandle);
+			
+		}
+		
+		private function could2EnterFrameHandle(event : Event) : void
+		{
+			event.currentTarget.y ++;
+			if(event.currentTarget.y == GameConfig.GAMEPANE_HEIGHT) {
+				event.currentTarget.y = -GameConfig.GAMEPANE_HEIGHT;
+			}
+		}
+		
+		private function could1EnterFrameHandle(event : Event) : void
+		{
+			event.currentTarget.y ++;
+			if(event.currentTarget.y == GameConfig.GAMEPANE_HEIGHT) {
+				event.currentTarget.y = -GameConfig.GAMEPANE_HEIGHT;
+			}
+		}
+		
 		public function initLv() : void
 		{
-			_currentBulletCount = GameConfig.BULLET_COUNT * _model.currentLv / 2;
-			createBullet();
-			createCoin();
+			var levelData : LevelData = new LevelData();
+			
+			if(_model.currentLv == GameConfig.SECTOR_LV_LINE) {
+				nimbus.sector = 45;
+			}
+			
+			if(levelData.lvData.length == _model.currentLv-1) {
+				currentLvArr = null;
+			} else {
+				currentLvArr = Vector.<Object>(levelData.lvData[_model.currentLv-1]);
+			}
+			
+			createBatch();
+			if(!coinLock) {
+				createCoin();
+				coinLock = true;
+			}
 		}
 		
 		public function restartGame() : void
@@ -136,9 +269,14 @@ package cn.sftech.www.view
 			birdEffect.vars.prop("y",240);
 			birdEffect.vars.prop("rotation",0);
 			birdEffect.vars.ease(Expo.easeIn);
+			birdEffect.vars.onComplete(
+				function createBirdHandle() : void
+				{
+					initLv();
+				});
 			birdEffect.play();
 			
-			initLv();
+			
 		}
 		
 		private function set currentScore(value : uint) : void
@@ -175,9 +313,12 @@ package cn.sftech.www.view
 		
 		private function set bulletCount(value : int) : void
 		{
+			trace(value);
 			_bulletCount = value;
 			if(value == 0) {
-				successLv();
+				if(currentLvArr.length == 0) {
+					successLv();
+				}
 			}
 		}
 		
@@ -188,6 +329,8 @@ package cn.sftech.www.view
 		
 		private function gameOver() : void
 		{
+			coinLock = false;
+			
 			this.dispatchEvent(new GameOverEvent());
 			
 			birdEffect.target = bird;
@@ -210,34 +353,99 @@ package cn.sftech.www.view
 			this.dispatchEvent(new GameSuccessEvent());
 		}
 		
+		private function createBatch() : void
+		{
+			if(currentLvArr == null) {
+//				_currentBatchType = Bullet;
+//				_currentBulletCount = MathUtil.random(1,5);
+//				_currentBatchVelocity = MathUtil.random(2,4);
+//				_currentBatchColor = MathUtil.random(0,3);
+//				_currentBatchQuadrant = MathUtil.random(1,5);
+			} else {
+				var currentBatch : Object = currentLvArr[0];
+				
+				_currentBulletCount = currentBatch.bulletCount;
+				_currentBatchVelocity = currentBatch.bulletVelocity;
+				_currentBatchTimer = currentBatch.batchTimer;
+				_currentBatchQuadrant = LevelData.getQuadrantByLast(_currentBatchQuadrant,currentBatch.bulletQuadrant);
+				
+				if(currentBatch.bulletColorType == 3) { //类型为钱币
+					_currentBatchType = Coin;
+				} else {
+					_currentBatchType = Bullet;
+					if(currentBatch.bulletColorType == 4) {
+						_currentBatchColor = MathUtil.random(1,4);
+					} else {
+						_currentBatchColor = LevelData.getColorByLast(_currentBatchColor,currentBatch.bulletColorType);
+					}
+					trace(_currentBatchColor  + " currentColor ");
+				}
+				
+			}
+			
+			createBullet();
+		}
+		
 		private function createBullet() : void
 		{
-			if(_currentBulletCount == 0) return;
 			//临时标记正负
 			var tempFlag : uint = MathUtil.random(0,2);
-			var bullet : Bullet = new Bullet();
-			if(tempFlag == 0) {
-				bullet.x = -bullet.width;
-			} else {
-				bullet.x = this.width + bullet.width;
+			
+			var bullet : BulletBase = new _currentBatchType();
+			
+			//设置坐标位置
+			switch(_currentBatchQuadrant) {
+				case 1:{ //第一象限
+					trace("第一象限");
+					bullet.x = GameConfig.GAMEPANE_WIDTH + bullet.width;
+					bullet.y = MathUtil.random(-GameConfig.GAMECENTER_Y,GameConfig.GAMECENTER_Y);
+				};break;
+				case 2:{ //第二象限
+					trace("第二象限");
+					bullet.x = GameConfig.GAMEPANE_WIDTH + bullet.width;
+					bullet.y = MathUtil.random(GameConfig.GAMECENTER_Y,GameConfig.GAMEPANE_HEIGHT + GameConfig.GAMECENTER_Y);
+				};break;
+				case 3:{ //第三象限
+					trace("第三象限");
+					bullet.x = -bullet.width;
+					bullet.y = MathUtil.random(GameConfig.GAMECENTER_Y,GameConfig.GAMEPANE_HEIGHT + GameConfig.GAMECENTER_Y);
+				};break;
+				case 4:{ //第四象限
+					trace("第四象限");
+					bullet.x = -bullet.width;
+					bullet.y = MathUtil.random(-GameConfig.GAMECENTER_Y,GameConfig.GAMECENTER_Y);
+				};break;
+			} 
+			//设置颜色
+			if(bullet is Bullet) {
+				(bullet as Bullet).color = _currentBatchColor;
 			}
-			bullet.y = MathUtil.random(0,this.height);
-			bullet.color = MathUtil.random(0,3);
-			bullet.ctanValue = (240 - bullet.y)/(400 - bullet.x);
+			bullet.ctanValue = (bird.y - bullet.y)/(bird.x - bullet.x);
 			bullet.angle = getAngle(bullet.x,bullet.y);
-			bullet.velocity = MathUtil.random(5,8);
+			bullet.velocity = _currentBatchVelocity;
 			bullet.addEventListener(KillBulletEvent.KILL_BULLET_EVENT,killBullet);
 			bullet.addEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 			addChild(bullet);
 
 			bulletCount ++;
 			_currentBulletCount --;
-			setTimeout(createBullet,GameConfig.BULLET_TIMER);
+			
+			if(_currentBulletCount == 0) {
+				if(currentLvArr) {
+					currentLvArr.splice(0,1);
+				}
+				if(currentLvArr.length == 0) {
+					return;
+				} else {
+					setTimeout(createBatch,_currentBatchTimer);
+				}
+			} else {
+				setTimeout(createBullet,GameConfig.BULLET_TIMER);
+			}
 		}
 		
 		private function createCoin() : void
 		{
-			if(_currentBulletCount == 0) return;
 			//临时标记正负
 			var tempFlag : uint = MathUtil.random(0,2);
 			var coin : Coin = new Coin();
@@ -247,14 +455,13 @@ package cn.sftech.www.view
 				coin.x = this.width + coin.width;
 			}
 			coin.y = MathUtil.random(0,this.height);
-			coin.ctanValue = (240 - coin.y)/(400 - coin.x);
+			coin.ctanValue = (GameConfig.GAMECENTER_Y - coin.y)/(GameConfig.GAMECENTER_X - coin.x);
 			coin.angle = getAngle(coin.x,coin.y);
-			coin.velocity = MathUtil.random(5,8);
-			coin.addEventListener(KillBulletEvent.KILL_BULLET_EVENT,killBullet);
+			coin.velocity = MathUtil.random(1,3);
+			coin.addEventListener(KillBulletEvent.KILL_BULLET_EVENT,killCoin);
 			coin.addEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 			addChild(coin);
-			bulletCount ++;
-			setTimeout(createCoin,MathUtil.random(4,8)*1000);
+			setTimeout(createCoin,MathUtil.random(6,10)*1000);
 		}
 		
 		private function getAngle(valueX : Number,valueY : Number) : Number
@@ -281,18 +488,21 @@ package cn.sftech.www.view
 		//-----------------mouse event ---------------------
 		private function mouseDownNimbusHandle(event : MouseEvent) : void
 		{
-			if(bird.hitTestPoint(this.mouseX,this.mouseY,true)) {
+			if(bird.core.hitTestPoint(this.mouseX,this.mouseY,true)) {
+				mouseDownFlag = true;
+			} else if(blood.hitTestPoint(this.mouseX,this.mouseY)) {
 				mouseDownFlag = true;
 			}
+			
 			this.addEventListener(MouseEvent.MOUSE_MOVE,mouseMoveNimbusHandle);
 			this.addEventListener(MouseEvent.MOUSE_UP,mouseUpNimbusHandle);
 		}
 		
 		private function mouseMoveNimbusHandle(event : MouseEvent) : void
 		{
-			if(!bird.hitTestPoint(this.mouseX,this.mouseY,true)) {
+			if(!bird.core.hitTestPoint(this.mouseX,this.mouseY,true) && !blood.hitTestPoint(this.mouseX,this.mouseY)) {
 				_currentNimbusAngle = getAngle(this.mouseX,this.mouseY);
-				_currentNimbusAngle += _currentNimbusAngle>0?-180:180;
+//				_currentNimbusAngle += _currentNimbusAngle>0?-180:180;
 				nimbus.rotation = _currentNimbusAngle;
 			}
 		}
@@ -312,8 +522,8 @@ package cn.sftech.www.view
 		private function changeColorHandle(event : MouseEvent = null) : void
 		{
 			var color : uint = bird.color;
-			if(color == 2) {
-				color = 0;
+			if(color == 3) {
+				color = 1;
 			} else {
 				color ++;
 			}
@@ -323,7 +533,7 @@ package cn.sftech.www.view
 		private function bulletEnterFrameHandle(event : Event) : void
 		{
 			var bullet : BulletBase = event.target as BulletBase;
-			trace(bullet.moveX + "    " + bullet.moveY);
+//			trace(bullet.moveX + "    " + bullet.moveY);
 			bullet.x += bullet.moveX*bullet.velocity;
 			bullet.y += bullet.moveY*bullet.velocity;
 			
@@ -338,7 +548,7 @@ package cn.sftech.www.view
 				bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 				bullet.killMyself();
 			} else if(Point.distance(new Point(bullet.x ,bullet.y),new Point(bird.x,bird.y))<115) {
-				trace(getAngle(bullet.x,bullet.y));
+//				trace(getAngle(bullet.x,bullet.y));
 				if(getAngle(bullet.x,bullet.y) > _currentNimbusAngle - nimbus.sector/2 - 10 &&
 					getAngle(bullet.x,bullet.y) < _currentNimbusAngle + nimbus.sector/2 + 10) {
 					if(bullet is Coin) {
@@ -355,7 +565,18 @@ package cn.sftech.www.view
 				} 
 			}
 			
-			if(bullet.x<- 100 || bullet.x> this.width + 100 || bullet.y< 0 || bullet.y > this.height) {
+			var canDel : Boolean = false;
+			if(bullet.quadrant == 1 || bullet.quadrant == 2) {
+				if(bullet.x < -100) {
+					canDel = true;
+				}
+			} else {
+				if(bullet.x > this.width + 100) {
+					canDel = true;
+				}
+			}
+			
+			if(canDel) {
 				bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 				removeChild(bullet);
 				bullet = null;
@@ -365,8 +586,18 @@ package cn.sftech.www.view
 		
 		private function killBullet(event : KillBulletEvent) : void
 		{
-			bulletCount --;
 			var bullet : BulletBase = event.target as BulletBase;
+			bulletCount --;
+			killBulletBase(bullet);
+		}
+		private function killCoin(event : KillBulletEvent) : void
+		{
+			var bullet : BulletBase = event.target as BulletBase;
+			killBulletBase(bullet);
+		}
+		
+		private function killBulletBase(bullet : BulletBase) : void
+		{
 			removeChild(bullet);
 			bullet = null;
 			

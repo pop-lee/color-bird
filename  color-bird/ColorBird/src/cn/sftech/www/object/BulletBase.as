@@ -27,10 +27,10 @@ package cn.sftech.www.object
 		 */		
 		private var _angle : Number;
 		
-//		/**
-//		 * 象限区域
-//		 */		
-//		private var _quadrant : Number = 0;
+		/**
+		 * 象限区域
+		 */		
+		private var _quadrant : Number = 0;
 		
 		public var moveX : Number;
 		public var moveY : Number;
@@ -63,32 +63,32 @@ package cn.sftech.www.object
 			if(_angle > 90) { //第二象限
 				moveX = -1;
 				moveY = moveX*ctanValue;
-				//				quadrant = 2;
+				quadrant = 2;
 			} else if(_angle > 0) { //第一象限
 				moveX = -1;
 				moveY = moveX*ctanValue;
-				//				quadrant = 1;
+				quadrant = 1;
 			} else if(_angle > -90) { //第四象限
 				moveX = 1;
 				moveY = moveX*ctanValue;
-				//				quadrant = 4;
+				quadrant = 4;
 			} else { //第三象限
 				moveX = 1;
 				moveY = moveX*ctanValue;
-				//				quadrant = 3;
+				quadrant = 3;
 			}
 			
 		}
 		
-//		public function set quadrant(value : uint) : void
-//		{
-//			_quadrant = value;
-//		}
-//		
-//		public function get quadrant() : uint
-//		{
-//			return _quadrant;
-//		}
+		public function set quadrant(value : uint) : void
+		{
+			_quadrant = value;
+		}
+		
+		public function get quadrant() : uint
+		{
+			return _quadrant;
+		}
 		
 		public function killMyself() : void
 		{
