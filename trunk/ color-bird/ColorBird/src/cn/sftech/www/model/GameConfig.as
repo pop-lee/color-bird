@@ -15,6 +15,26 @@ package cn.sftech.www.model
 //		public static const SPACE_7 : uint = 7;
 //		public static const SPACE_8 : uint = 8;
 		
+		/**
+		 * 游戏面板中心点X坐标 
+		 */		
+		public static const GAMECENTER_X : uint = 400;
+		/**
+		 * 游戏面板中心点Y坐标
+		 */		
+		public static const GAMECENTER_Y : uint = 240;
+		
+		/**
+		 * 游戏面板中心点X坐标 
+		 */		
+		public static const GAMEPANE_WIDTH : uint = 800;
+		/**
+		 * 游戏面板中心点Y坐标
+		 */		
+		public static const GAMEPANE_HEIGHT : uint = 480;
+		
+		//----------------------------------------------
+		
 		
 		/**
 		 * 子弹每关数量基数
@@ -32,7 +52,12 @@ package cn.sftech.www.model
 		/**
 		 * 每相隔毫秒数创建子弹
 		 */		
-		public static const BULLET_TIMER : uint = 2000;
+		public static const BULLET_TIMER : uint = 500;
+		
+		/**
+		 * 每相隔毫秒数创建子弹
+		 */		
+		public static const BATCH_TIMER : uint = 500;
 		
 		/**
 		 * 挡掉子弹得分
@@ -42,6 +67,8 @@ package cn.sftech.www.model
 		 * 挡掉钱币得分
 		 */		
 		public static const COIN_SCORE : uint = 500;
+		
+		public static const SECTOR_LV_LINE : uint = 8;
 		
 		public function GameConfig()
 		{

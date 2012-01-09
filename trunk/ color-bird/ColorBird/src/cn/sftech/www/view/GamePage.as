@@ -80,7 +80,7 @@ package cn.sftech.www.view
 			lvImage.y = -10;
 			gameSuccessPane.addChild(lvImage);
 			
-			var timer : Timer = new Timer(2000,1);
+			var timer : Timer = new Timer(0,1);
 			timer.addEventListener(TimerEvent.TIMER_COMPLETE,
 				function timerHandle(event : TimerEvent) : void
 				{

@@ -4,6 +4,7 @@ package
 	import cn.sftech.www.effect.viewStackEffect.SFViewStackGradientEffect;
 	import cn.sftech.www.event.SFInitializeDataEvent;
 	import cn.sftech.www.util.DataManager;
+	import cn.sftech.www.util.FPSViewer;
 	import cn.sftech.www.view.GamePage;
 	import cn.sftech.www.view.SFApplication;
 	import cn.sftech.www.view.SFLogo;
@@ -87,6 +88,8 @@ package
 		
 		private function initUI() : void
 		{
+			FPSViewer.showFPS();
+			
 			vs = new SFViewStack();
 			vs.percentWidth = this.width;
 			vs.percentHeight = this.height;

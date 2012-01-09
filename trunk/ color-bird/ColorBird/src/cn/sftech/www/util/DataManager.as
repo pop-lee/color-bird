@@ -70,8 +70,8 @@ package cn.sftech.www.util
 		private function queryScoreResult(result : Object) : void
 		{
 			if(result.code == 0) { // 保存成功
-				outList();
 				_model.currentMaxScore = result.score.score;
+				outList();
 			} else {
 				outList();
 				trace(result.code + "     保存失败");

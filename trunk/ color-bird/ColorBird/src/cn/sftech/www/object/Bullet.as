@@ -23,7 +23,7 @@ package cn.sftech.www.object
 		public function Bullet()
 		{
 			super();
-			color = 0;
+			color = 1;
 		}
 		
 		public function set color(value : uint) : void
@@ -34,13 +34,13 @@ package cn.sftech.www.object
 			}
 			
 			switch(value) {
-				case 0:{
+				case 1:{
 					_body = new RedBullet();
 				};break;
-				case 1:{
+				case 2:{
 					_body = new YellowBullet();
 				};break;
-				case 2:{
+				case 3:{
 					_body = new BlueBullet();
 				}
 			}
