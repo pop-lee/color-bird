@@ -18,9 +18,15 @@ package cn.sftech.www.object
 		 */		
 		private var _color : uint = 0;
 		
+		private var _oldColor : uint = 0;
+		
 		private var _body : MovieClip;
 		
+		private var _nimbus : Nimbus;
+		
 		private var _isSuper : Boolean = false;
+		
+		public var isSuperStatus : Boolean = false;
 		
 		public function Bird()
 		{
@@ -35,9 +41,15 @@ package cn.sftech.www.object
 		
 		public function set color(value : uint) : void
 		{
+			if(_color != 4) {
+				_oldColor = _color;
+			}
 			_color = value;
 			if(_body) {
 				removeChild(_body);
+			}
+			if(_nimbus) {
+				_nimbus.color = _color;
 			}
 			
 			switch(value) {
@@ -49,7 +61,10 @@ package cn.sftech.www.object
 				};break;
 				case 3:{
 					_body = new BlueBird();
-				}
+				};break;
+				case 4:{
+					_body = new SuperBird();
+				};break;
 			}
 			
 			addChild(_body);
@@ -59,21 +74,32 @@ package cn.sftech.www.object
 			return _color;
 		}
 		
-		public function get core() : MovieClip
+		public function set nimbus(nimbus : Nimbus) : void
 		{
-			return _body.core;
+			_nimbus = nimbus;
+			_nimbus.color = _color;
+			addChild(_nimbus);
+		}
+		
+		public function get body() : MovieClip
+		{
+			return _body.body;
 		}
 		
 		public function makeSuper() : void
 		{
-//			var timer : Timer = new Timer(200,10);
-			
+			color = 4;
+		}
+		
+		public function recoverNormal() : void
+		{
+			color = _oldColor;
 		}
 		
 		public function hurt() : void
 		{
-			_body.gotoAndPlay(10);
-			makeSuper();
+			_body.gotoAndPlay(9);
+//			makeSuper();
 		}
 		
 		//----------------Event Handle--------------------

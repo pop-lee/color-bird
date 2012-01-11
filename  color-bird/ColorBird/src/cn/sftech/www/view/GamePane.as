@@ -8,6 +8,7 @@ package cn.sftech.www.view
 	import cn.sftech.www.model.GameConfig;
 	import cn.sftech.www.model.LevelData;
 	import cn.sftech.www.model.ModelLocator;
+	import cn.sftech.www.object.Angry;
 	import cn.sftech.www.object.Bird;
 	import cn.sftech.www.object.Blood;
 	import cn.sftech.www.object.Bullet;
@@ -26,8 +27,10 @@ package cn.sftech.www.view
 	import flash.display.MovieClip;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.events.TimerEvent;
 	import flash.geom.Point;
 	import flash.system.System;
+	import flash.utils.Timer;
 	import flash.utils.setTimeout;
 
 	public class GamePane extends SFMovieClip
@@ -57,6 +60,10 @@ package cn.sftech.www.view
 		 * 菜单按钮
 		 */		
 		private var menuBtn : MenuBtn;
+		/**
+		 * 愤怒按钮
+		 */		
+		private var angry : Angry;
 		/**
 		 * 分数数字面板
 		 */		
@@ -103,6 +110,10 @@ package cn.sftech.www.view
 		 * 第一创建的颜色
 		 */		
 		private var _lastBatchColor : uint = 0;
+		/**
+		 * 超级状态计时器
+		 */		
+		private var superTimer : Timer = new Timer(200,1);
 		
 		///////////////////////////////////////////////////////////////////////
 		
@@ -142,10 +153,17 @@ package cn.sftech.www.view
 			addChild(bird);
 			
 			nimbus = new Nimbus();
-			nimbus.color = bird.color;
+//			nimbus.color = bird.color;
 //			nimbus.x = this.width/2;
 //			nimbus.y = this.height/2;
-			bird.addChild(nimbus);
+			bird.nimbus = nimbus;
+			
+			blood = new Blood();
+			blood.x = 20;
+			blood.y = 435;
+			blood.color = bird.color;
+			blood.addEventListener(MouseEvent.CLICK,changeColorHandle);
+			addChild(blood);
 			
 			scoreBar = new ScoreBar();
 			scoreBar.x = 570;
@@ -159,16 +177,17 @@ package cn.sftech.www.view
 			scoreNum.y = 15;
 			scoreBar.addChild(scoreNum);
 			
-			blood = new Blood();
-			blood.x = 55;
-			blood.y = 425;
-			blood.addEventListener(MouseEvent.CLICK,changeColorHandle);
-			addChild(blood);
-			
 			menuBtn = new MenuBtn();
 			menuBtn.x = 725;
 			menuBtn.y = 405;
 			addChild(menuBtn);
+			
+			angry = new Angry();
+			angry.value = 0;
+			angry.x = 400;
+			angry.y = 440;
+			angry.addEventListener(MouseEvent.CLICK,makeSuperBird);
+			addChild(angry);
 			
 			this.addEventListener(MouseEvent.MOUSE_DOWN,mouseDownNimbusHandle);
 			
@@ -179,7 +198,7 @@ package cn.sftech.www.view
 		
 		private function initData() : void
 		{
-			currentBlood = 10;
+			blood.blood = GameConfig.TOTAL_BLOOD;
 			currentScore = 0;
 			_model.currentLv = 1;
 			_currentBatchQuadrant = MathUtil.random(1,5);
@@ -258,10 +277,8 @@ package cn.sftech.www.view
 		
 		public function restartGame() : void
 		{
-			_model.currentLv = 1;
-			currentBlood = 3;
-			currentScore = 0;
-			blood.reBack();
+			initData();
+			blood.blood = GameConfig.TOTAL_BLOOD;
 			
 			birdEffect.target = bird;
 			birdEffect.duration = 1;
@@ -488,7 +505,7 @@ package cn.sftech.www.view
 		//-----------------mouse event ---------------------
 		private function mouseDownNimbusHandle(event : MouseEvent) : void
 		{
-			if(bird.core.hitTestPoint(this.mouseX,this.mouseY,true)) {
+			if(bird.body.hitTestPoint(this.mouseX,this.mouseY,true)) {
 				mouseDownFlag = true;
 			} else if(blood.hitTestPoint(this.mouseX,this.mouseY)) {
 				mouseDownFlag = true;
@@ -500,7 +517,8 @@ package cn.sftech.www.view
 		
 		private function mouseMoveNimbusHandle(event : MouseEvent) : void
 		{
-			if(!bird.core.hitTestPoint(this.mouseX,this.mouseY,true) && !blood.hitTestPoint(this.mouseX,this.mouseY)) {
+			if(Point.distance(new Point(this.mouseX,this.mouseY),new Point(GameConfig.GAMECENTER_X,GameConfig.GAMECENTER_Y))>90
+				&& !blood.hitTestPoint(this.mouseX,this.mouseY)) {
 				_currentNimbusAngle = getAngle(this.mouseX,this.mouseY);
 //				_currentNimbusAngle += _currentNimbusAngle>0?-180:180;
 				nimbus.rotation = _currentNimbusAngle;
@@ -530,6 +548,27 @@ package cn.sftech.www.view
 			nimbus.color = blood.color = bird.color = color;
 		}
 		
+		private var temp : uint = 0;
+		private function makeSuperBird(event : MouseEvent) : void
+		{
+			temp ++;
+			if(temp == 2) {
+				trace(2);
+			}
+			bird.makeSuper();
+			if(!superTimer.hasEventListener(TimerEvent.TIMER_COMPLETE)) {
+				superTimer.addEventListener(TimerEvent.TIMER_COMPLETE,
+					function timerHandle(event : TimerEvent) : void
+					{
+						superTimer.removeEventListener(TimerEvent.TIMER_COMPLETE,timerHandle);
+						superTimer.stop();
+						bird.recoverNormal();
+					});
+				superTimer.start();
+			}
+		}
+			
+		
 		private function bulletEnterFrameHandle(event : Event) : void
 		{
 			var bullet : BulletBase = event.target as BulletBase;
@@ -537,13 +576,12 @@ package cn.sftech.www.view
 			bullet.x += bullet.moveX*bullet.velocity;
 			bullet.y += bullet.moveY*bullet.velocity;
 			
-			if(bullet.hitTestObject(bird.core)) {
+			if(bullet.hitTestObject(bird.body)) {
 				if(bullet is Coin) {
 					currentScore += GameConfig.COIN_SCORE;
 				} else {
 					bird.hurt();
-					blood.hurt();
-					currentBlood --;
+					blood.blood--;
 				}
 				bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 				bullet.killMyself();
@@ -560,6 +598,8 @@ package cn.sftech.www.view
 							currentScore += GameConfig.BULLET_SCORE;
 							bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 							bullet.killMyself();
+							
+							angry.value ++;
 						}
 					}
 				} 

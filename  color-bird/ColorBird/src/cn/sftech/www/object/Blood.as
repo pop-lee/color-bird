@@ -1,5 +1,6 @@
 package cn.sftech.www.object
 {
+	import cn.sftech.www.model.GameConfig;
 	import cn.sftech.www.view.SFMovieClip;
 	
 	import flash.display.MovieClip;
@@ -16,35 +17,35 @@ package cn.sftech.www.object
 		
 		private var _body : MovieClip;
 		
+		private var _blood : uint;
+		
 		public function Blood()
 		{
 			super();
-			color = 0;
+			color = 1;
 		}
 		
 		public function set color(value : uint) : void
 		{
 			_color = value;
 			
-			
 			if(_body) {
-				var _bodyFrame : int = _body.currentFrame;
 				removeChild(_body);
 			}
 			
 			switch(value) {
-				case 0:{
+				case 1:{
 					_body = new RedBlood;
 				};break;
-				case 1:{
+				case 2:{
 					_body = new YellowBlood();
 				};break;
-				case 2:{
+				case 3:{
 					_body = new BlueBlood();
 				}
 			}
 			
-			_body.gotoAndStop(_bodyFrame);
+			_body.body.scaleX = _blood / GameConfig.TOTAL_BLOOD;
 			
 			addChild(_body);
 		}
@@ -54,14 +55,16 @@ package cn.sftech.www.object
 			return _color;
 		}
 		
-		public function reBack() : void
+		public function set blood(value : uint) : void
 		{
-			_body.gotoAndStop(1);
+			_blood = value;
+			_body.body.scaleX = _blood / GameConfig.TOTAL_BLOOD;
 		}
 		
-		public function hurt() : void
+		public function get blood() : uint
 		{
-			_body.nextFrame();
+			return _blood;
 		}
+		
 	}
 }

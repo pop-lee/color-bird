@@ -69,6 +69,14 @@ package cn.sftech.www.model
 		public static const COIN_SCORE : uint = 500;
 		
 		public static const SECTOR_LV_LINE : uint = 8;
+		/**
+		 * 血量总数
+		 */		
+		public static const TOTAL_BLOOD : uint = 10;
+		/**
+		 * 愤怒值满
+		 */		
+		public static const TOTAL_ANGRY : uint = 10;
 		
 		public function GameConfig()
 		{

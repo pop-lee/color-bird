@@ -64,6 +64,9 @@ package cn.sftech.www.object
 				};break;
 				case 3:{
 					_body = new BlueNimbus();
+				};break;
+				case 4:{
+					_body = new SuperNimbus();
 				}
 			}
 			
