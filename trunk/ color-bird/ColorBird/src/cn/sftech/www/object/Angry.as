@@ -22,7 +22,10 @@ package cn.sftech.www.object
 		{
 			_value = value;
 //			trace(_body.body.y);
-			if(_value > GameConfig.TOTAL_ANGRY) return;
+			if(_value > GameConfig.TOTAL_ANGRY) {
+				_value = GameConfig.TOTAL_ANGRY;
+				return;
+			}
 			_body.body.y = _body.height*(1-_value/GameConfig.TOTAL_ANGRY) - _body.height/2;
 			_body.body.scaleY = _value/GameConfig.TOTAL_ANGRY;
 		}
