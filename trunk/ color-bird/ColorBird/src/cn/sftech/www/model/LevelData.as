@@ -18,6 +18,8 @@ package cn.sftech.www.model
 		public var lvData : Array = [
 			//第一关（只会遇到一种颜色）
 			[
+//				{bulletCount : 1,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 1,batchTimer : 10000000},
+				
 				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 1,batchTimer : 1000},
 				{bulletCount : 1,bulletVelocity : 4,bulletColorType : 1,bulletQuadrant : 2,batchTimer : 3000},
 				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 1000},
@@ -118,52 +120,157 @@ package cn.sftech.www.model
 				
 				{bulletCount : 2,bulletVelocity : 5,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 0},
 				{bulletCount : 1,bulletVelocity : 4,bulletColorType : 1,bulletQuadrant : 3,batchTimer : 3000},
-				{bulletCount : 5,bulletVelocity : 10,bulletColorType : 1,bulletQuadrant : 3,batchTimer : 1000},
+				{bulletCount : 5,bulletVelocity : 10,bulletColorType : 1,bulletQuadrant : 3,batchTimer : 2000},
 			],
-//			//第十关
-//			[
-//				{bulletCount : 1,bulletVelocity : 4,bulletColorType : 2},
-//				{bulletCount : 2,bulletVelocity : 2,bulletColorType : 2},
-//				{bulletCount : 2,bulletVelocity : 3,bulletColorType : 2},
-//				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 2},
-//				{bulletCount : 2,bulletVelocity : 3,bulletColorType : 2},
-//				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 2}
-//			],
-//			//第十一关
-//			[
-//				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 2},
-//				{bulletCount : 2,bulletVelocity : 3,bulletColorType : 2},
-//				{bulletCount : 2,bulletVelocity : 3,bulletColorType : 2},
-//				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 2},
-//				{bulletCount : 2,bulletVelocity : 3,bulletColorType : 2},
-//				{bulletCount : 2,bulletVelocity : 2,bulletColorType : 2},
-//				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 2},
-//				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 2}
-//			],
-//			//第十二关
-//			[
-//				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 2},
-//				{bulletCount : 2,bulletVelocity : 3,bulletColorType : 2},
-//				{bulletCount : 2,bulletVelocity : 3,bulletColorType : 2},
-//				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 2},
-//				{bulletCount : 2,bulletVelocity : 3,bulletColorType : 2},
-//				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 2},
-//				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 2},
-//				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 2}
-//			],
-//			//第十三关
-//			[
-//				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 2},
-//				{bulletCount : 2,bulletVelocity : 3,bulletColorType : 2},
-//				{bulletCount : 2,bulletVelocity : 3,bulletColorType : 2},
-//				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 2},
-//				{bulletCount : 3,bulletVelocity : 3,bulletColorType : 2},
-//				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 2},
-//				{bulletCount : 3,bulletVelocity : 3,bulletColorType : 2},
-//				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 2},
-//				{bulletCount : 3,bulletVelocity : 4,bulletColorType : 2},
-//				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 2}
-//			]
+			//第十关(难度提升点：两种颜色四个方向）
+			[
+				{bulletCount : 3,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 1,batchTimer : 1000},
+				{bulletCount : 3,bulletVelocity : 4,bulletColorType : 1,bulletQuadrant : 2,batchTimer : 1000},
+				{bulletCount : 3,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 1000},
+				{bulletCount : 3,bulletVelocity : 4,bulletColorType : 1,bulletQuadrant : 2,batchTimer : 1000},
+				
+				{bulletCount : 3,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 1000},
+				{bulletCount : 3,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 1000},
+				{bulletCount : 3,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 2,batchTimer : 1000},
+				{bulletCount : 3,bulletVelocity : 4,bulletColorType : 1,bulletQuadrant : 3,batchTimer : 1000},
+				
+				{bulletCount : 3,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 1000},
+				{bulletCount : 3,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 1000},
+				{bulletCount : 3,bulletVelocity : 4,bulletColorType : 1,bulletQuadrant : 2,batchTimer : 1000},
+				{bulletCount : 3,bulletVelocity : 4,bulletColorType : 1,bulletQuadrant : 2,batchTimer : 1000},
+			],
+			//第十一关(难度提升点：打破节奏 数量增加  同色12个球）
+			[
+				{bulletCount : 3,bulletVelocity : 5,bulletColorType : 2,bulletQuadrant : 1,batchTimer : 500},
+				{bulletCount : 3,bulletVelocity : 5,bulletColorType : 1,bulletQuadrant : 3,batchTimer : 500},
+				{bulletCount : 3,bulletVelocity : 5,bulletColorType : 1,bulletQuadrant : 2,batchTimer : 500},
+				{bulletCount : 3,bulletVelocity : 5,bulletColorType : 1,bulletQuadrant : 3,batchTimer : 500},
+				
+				{bulletCount : 3,bulletVelocity : 5,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 500},
+				{bulletCount : 3,bulletVelocity : 5,bulletColorType : 1,bulletQuadrant : 3,batchTimer : 500},
+				{bulletCount : 3,bulletVelocity : 5,bulletColorType : 1,bulletQuadrant : 2,batchTimer : 500},
+				{bulletCount : 3,bulletVelocity : 5,bulletColorType : 1,bulletQuadrant : 3,batchTimer : 500},
+				
+				{bulletCount : 3,bulletVelocity : 5,bulletColorType : 2,bulletQuadrant : 2,batchTimer : 500},
+				{bulletCount : 3,bulletVelocity : 5,bulletColorType : 1,bulletQuadrant : 3,batchTimer : 500},
+				{bulletCount : 3,bulletVelocity : 5,bulletColorType : 1,bulletQuadrant : 2,batchTimer : 500},
+				{bulletCount : 3,bulletVelocity : 5,bulletColorType : 1,bulletQuadrant : 3,batchTimer : 500},
+			],
+			//第十二关(难度提升点：后刷新的球先到)
+			[
+				{bulletCount : 2,bulletVelocity : 3,bulletColorType : 2,bulletQuadrant : 2,batchTimer : 1000},
+				{bulletCount : 1,bulletVelocity : 6,bulletColorType : 2,bulletQuadrant : 1,batchTimer : 3000},
+				
+				{bulletCount : 2,bulletVelocity : 3,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 1000},
+				{bulletCount : 1,bulletVelocity : 6,bulletColorType : 2,bulletQuadrant : 1,batchTimer : 3000},
+				
+				{bulletCount : 2,bulletVelocity : 3,bulletColorType : 2,bulletQuadrant : 2,batchTimer : 1000},
+				{bulletCount : 1,bulletVelocity : 6,bulletColorType : 2,bulletQuadrant : 1,batchTimer : 3000},
+				
+				{bulletCount : 2,bulletVelocity : 3,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 1000},
+				{bulletCount : 1,bulletVelocity : 6,bulletColorType : 2,bulletQuadrant : 1,batchTimer : 1000},
+			],
+			//第十三关(难度提升点：干扰项增多)
+			[
+				{bulletCount : 2,bulletVelocity : 3,bulletColorType : 2,bulletQuadrant : 2,batchTimer : 1000},
+				{bulletCount : 2,bulletVelocity : 7,bulletColorType : 2,bulletQuadrant : 1,batchTimer : 500},
+				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 3000},
+				
+				{bulletCount : 2,bulletVelocity : 3,bulletColorType : 2,bulletQuadrant : 2,batchTimer : 1000},
+				{bulletCount : 2,bulletVelocity : 7,bulletColorType : 2,bulletQuadrant : 1,batchTimer : 500},
+				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 3000},
+			],
+			//第十四关(难度提升点：三种颜色三个方向)
+			[
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 2,batchTimer : 1000},
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 1000},
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 2,batchTimer : 3000},
+				
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 1000},
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 1000},
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 2,batchTimer : 3000},
+				
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 1000},
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 1000},
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 2,batchTimer : 3000},
+				
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 1000},
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 1000},
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 2,batchTimer : 3000},
+			],
+			//第十五关(难度提升点：你想反应+变色)
+			[
+				{bulletCount : 2,bulletVelocity : 3,bulletColorType : 2,bulletQuadrant : 2,batchTimer : 1000},
+				{bulletCount : 1,bulletVelocity : 6,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 3000},
+				
+				{bulletCount : 2,bulletVelocity : 3,bulletColorType : 2,bulletQuadrant : 2,batchTimer : 1000},
+				{bulletCount : 1,bulletVelocity : 6,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 3000},
+				
+				{bulletCount : 2,bulletVelocity : 3,bulletColorType : 2,bulletQuadrant : 2,batchTimer : 1000},
+				{bulletCount : 1,bulletVelocity : 6,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 3000},
+			],
+			//第十六关(难度提升点：四个方向两种颜色的球 后刷新的先到 数量增多)
+			[
+				{bulletCount : 4,bulletVelocity : 2,bulletColorType : 2,bulletQuadrant : 2,batchTimer : 1500},
+				{bulletCount : 2,bulletVelocity : 7,bulletColorType : 2,bulletQuadrant : 2,batchTimer : 3000},
+				
+				{bulletCount : 4,bulletVelocity : 2,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 1500},
+				{bulletCount : 2,bulletVelocity : 7,bulletColorType : 2,bulletQuadrant : 2,batchTimer : 3000},
+				
+				{bulletCount : 4,bulletVelocity : 2,bulletColorType : 2,bulletQuadrant : 2,batchTimer : 1500},
+				{bulletCount : 2,bulletVelocity : 7,bulletColorType : 2,bulletQuadrant : 2,batchTimer : 3000},
+				
+				{bulletCount : 4,bulletVelocity : 2,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 1500},
+				{bulletCount : 2,bulletVelocity : 7,bulletColorType : 2,bulletQuadrant : 2,batchTimer : 3000},
+			],
+			//第十七关(难度提升点：欺骗关卡的变种)
+			[
+				{bulletCount : 2,bulletVelocity : 2,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 500},
+				{bulletCount : 2,bulletVelocity : 2,bulletColorType : 1,bulletQuadrant : 3,batchTimer : 500},
+				{bulletCount : 2,bulletVelocity : 2,bulletColorType : 1,bulletQuadrant : 2,batchTimer : 1500},
+				{bulletCount : 1,bulletVelocity : 6,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 3000},
+				
+				{bulletCount : 2,bulletVelocity : 2,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 500},
+				{bulletCount : 2,bulletVelocity : 2,bulletColorType : 1,bulletQuadrant : 3,batchTimer : 500},
+				{bulletCount : 2,bulletVelocity : 2,bulletColorType : 1,bulletQuadrant : 2,batchTimer : 1500},
+				{bulletCount : 1,bulletVelocity : 6,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 3000},
+				
+				{bulletCount : 2,bulletVelocity : 2,bulletColorType : 2,bulletQuadrant : 2,batchTimer : 500},
+				{bulletCount : 2,bulletVelocity : 2,bulletColorType : 1,bulletQuadrant : 3,batchTimer : 500},
+				{bulletCount : 2,bulletVelocity : 2,bulletColorType : 1,bulletQuadrant : 2,batchTimer : 1500},
+				{bulletCount : 1,bulletVelocity : 6,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 3000},
+				
+				{bulletCount : 2,bulletVelocity : 2,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 500},
+				{bulletCount : 2,bulletVelocity : 2,bulletColorType : 1,bulletQuadrant : 3,batchTimer : 500},
+				{bulletCount : 2,bulletVelocity : 2,bulletColorType : 1,bulletQuadrant : 2,batchTimer : 1500},
+				{bulletCount : 1,bulletVelocity : 6,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 3000},
+			],
+			//第十八关(难度提升点：三种颜色四个方向)
+			[
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 1,batchTimer : 800},
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 800},
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 2,batchTimer : 800},
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 1000},
+				
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 1,batchTimer : 800},
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 800},
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 2,batchTimer : 800},
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 1000},
+				
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 1,batchTimer : 800},
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 800},
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 2,batchTimer : 800},
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 1000},
+				
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 1,batchTimer : 800},
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 800},
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 2,batchTimer : 800},
+				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 1000},
+				//temp
+				{bulletCount : 1,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 300000000},
+				{bulletCount : 1,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 300000000},
+				
+			],
 			
 		];
 		
