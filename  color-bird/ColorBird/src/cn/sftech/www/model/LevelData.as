@@ -274,6 +274,31 @@ package cn.sftech.www.model
 			
 		];
 		
+		public var crazeData : Array = [
+			//第一关（只会遇到一种颜色）
+			[
+				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 4,bulletQuadrant : 1,batchTimer : 0},
+				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 4,bulletQuadrant : 3,batchTimer : 0},
+				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 4,bulletQuadrant : 2,batchTimer : 0},
+				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 4,bulletQuadrant : 3,batchTimer : 1000},
+				
+				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 4,bulletQuadrant : 1,batchTimer : 0},
+				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 4,bulletQuadrant : 3,batchTimer : 0},
+				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 4,bulletQuadrant : 2,batchTimer : 0},
+				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 4,bulletQuadrant : 3,batchTimer : 1000},
+				
+				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 4,bulletQuadrant : 1,batchTimer : 0},
+				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 4,bulletQuadrant : 3,batchTimer : 0},
+				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 4,bulletQuadrant : 2,batchTimer : 0},
+				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 4,bulletQuadrant : 3,batchTimer : 1000},
+				
+				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 4,bulletQuadrant : 1,batchTimer : 0},
+				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 4,bulletQuadrant : 3,batchTimer : 0},
+				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 4,bulletQuadrant : 2,batchTimer : 0},
+				{bulletCount : 2,bulletVelocity : 4,bulletColorType : 4,bulletQuadrant : 3,batchTimer : 1000},
+			]
+		]
+		
 		public function LevelData()
 		{
 		}

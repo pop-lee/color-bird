@@ -128,6 +128,8 @@ package cn.sftech.www.view
 		
 		private var _currentNimbusAngle : int = 180;
 		
+		private var _isAngry : Boolean = true;
+		
 		/**
 		 * 当前界面上剩余未销毁子弹数
 		 */
@@ -200,7 +202,7 @@ package cn.sftech.www.view
 		{
 			blood.blood = GameConfig.TOTAL_BLOOD;
 			currentScore = 0;
-			_model.currentLv = 1;
+			_model.currentLv = 37;
 			_currentBatchQuadrant = MathUtil.random(1,5);
 			_currentBatchColor = bird.color;
 		}
@@ -258,14 +260,15 @@ package cn.sftech.www.view
 		{
 			var levelData : LevelData = new LevelData();
 			
-			if(_model.currentLv == GameConfig.SECTOR_LV_LINE) {
-				nimbus.sector = 45;
-			}
-			
-			if(levelData.lvData.length == _model.currentLv-1) {
-				currentLvArr = null;
-			} else {
+			if(_model.currentLv-1 < levelData.lvData.length) {
 				currentLvArr = Vector.<Object>(levelData.lvData[_model.currentLv-1]);
+			} else if(_model.currentLv-1 < levelData.lvData.length*2) {
+				trace((_model.currentLv-1)%levelData.lvData.length);
+				nimbus.sector = 45;
+				currentLvArr = Vector.<Object>(levelData.lvData[(_model.currentLv-1)%levelData.lvData.length]);
+			} else {
+				trace(MathUtil.random(levelData.lvData.length-6,levelData.lvData.length-1));
+				currentLvArr = Vector.<Object>(levelData.lvData[MathUtil.random(levelData.lvData.length-6,levelData.lvData.length-1)]);
 			}
 			
 			createBatch();
@@ -278,7 +281,6 @@ package cn.sftech.www.view
 		public function restartGame() : void
 		{
 			initData();
-			blood.blood = GameConfig.TOTAL_BLOOD;
 			
 			birdEffect.target = bird;
 			birdEffect.duration = 1;
@@ -370,15 +372,16 @@ package cn.sftech.www.view
 			this.dispatchEvent(new GameSuccessEvent());
 		}
 		
+		private function createCrazyBullet() : void
+		{
+			var levelData : LevelData = new LevelData();
+			currentLvArr = Vector.<Object>(levelData);
+			createBatch();
+		}
+		
 		private function createBatch() : void
 		{
-			if(currentLvArr == null) {
-//				_currentBatchType = Bullet;
-//				_currentBulletCount = MathUtil.random(1,5);
-//				_currentBatchVelocity = MathUtil.random(2,4);
-//				_currentBatchColor = MathUtil.random(0,3);
-//				_currentBatchQuadrant = MathUtil.random(1,5);
-			} else {
+			if(currentLvArr != null) {
 				var currentBatch : Object = currentLvArr[0];
 				
 				_currentBulletCount = currentBatch.bulletCount;
@@ -548,23 +551,23 @@ package cn.sftech.www.view
 			nimbus.color = blood.color = bird.color = color;
 		}
 		
-		private var temp : uint = 0;
 		private function makeSuperBird(event : MouseEvent) : void
 		{
-			temp ++;
-			if(temp == 2) {
-				trace(2);
-			}
-			bird.makeSuper();
-			if(!superTimer.hasEventListener(TimerEvent.TIMER_COMPLETE)) {
-				superTimer.addEventListener(TimerEvent.TIMER_COMPLETE,
-					function timerHandle(event : TimerEvent) : void
-					{
-						superTimer.removeEventListener(TimerEvent.TIMER_COMPLETE,timerHandle);
-						superTimer.stop();
-						bird.recoverNormal();
-					});
-				superTimer.start();
+			if(_isAngry) {
+				bird.makeSuper();
+				if(!superTimer.hasEventListener(TimerEvent.TIMER_COMPLETE)) {
+					superTimer.addEventListener(TimerEvent.TIMER_COMPLETE,
+						function timerHandle(event : TimerEvent) : void
+						{
+							superTimer.removeEventListener(TimerEvent.TIMER_COMPLETE,timerHandle);
+							superTimer.stop();
+							bird.recoverNormal();
+						});
+					superTimer.start();
+				}
+				
+				_currentVelocity = 2;
+				angry.value = 0;
 			}
 		}
 			
@@ -573,8 +576,8 @@ package cn.sftech.www.view
 		{
 			var bullet : BulletBase = event.target as BulletBase;
 //			trace(bullet.moveX + "    " + bullet.moveY);
-			bullet.x += bullet.moveX*bullet.velocity;
-			bullet.y += bullet.moveY*bullet.velocity;
+			bullet.x += bullet.moveX*bullet.velocity*_currentVelocity;
+			bullet.y += bullet.moveY*bullet.velocity*_currentVelocity;
 			
 			if(bullet.hitTestObject(bird.body)) {
 				if(bullet is Coin) {
@@ -594,12 +597,18 @@ package cn.sftech.www.view
 						bullet.killMyself();
 					} else {
 						var _bullet : Bullet = bullet as Bullet;
-						if(_bullet.color == nimbus.color) {
+						if(_bullet.color == nimbus.color || _isAngry) {
 							currentScore += GameConfig.BULLET_SCORE;
 							bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 							bullet.killMyself();
 							
-							angry.value ++;
+							//变化怒气槽
+							if(!_isAngry) {
+								angry.value ++;
+								if(angry.value == GameConfig.TOTAL_ANGRY) {
+									_isAngry = true;
+								}
+							}
 						}
 					}
 				} 
