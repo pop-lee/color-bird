@@ -57,6 +57,14 @@ package cn.sftech.www.view
 		 */		
 		private var blood : Blood;
 		/**
+		 * 暂停页
+		 */		
+		private var pausingPage : PausingPage;
+		/**
+		 * 遮罩在游戏场景上
+		 */		
+		private var gamePanel : SFContainer;
+		/**
 		 * 菜单按钮
 		 */		
 		private var menuBtn : MenuBtn;
@@ -130,6 +138,10 @@ package cn.sftech.www.view
 		 * 是否以结束
 		 */		
 		private var isGameOver : Boolean = false;
+		/**
+		 * 当前是否在暂停状态
+		 */		
+		private var isPauseing : Boolean = false;
 		
 		///////////////////////////////////////////////////////////////////////
 		
@@ -141,6 +153,10 @@ package cn.sftech.www.view
 		 * 当前全局速度
 		 */		
 		private var _currentVelocity : uint = 1;
+		/**
+		 * 用来存储暂停前的速度
+		 */		
+		private var _oldVelocity : uint = 1;
 		
 		private var _currentNimbusAngle : int = 180;
 		
@@ -168,11 +184,17 @@ package cn.sftech.www.view
 		{
 			initUI();
 			
+			gamePanel = new SFContainer();
+			gamePanel.width = GameConfig.GAMEPANE_WIDTH;
+			gamePanel.height = GameConfig.GAMEPANE_HEIGHT;
+			gamePanel.backgroundAlpha = 0;
+			addChild(gamePanel);
+			
 			bird = new Bird();
 			bird.x = 400;
 			bird.y = 240;
 			bird.color = MathUtil.random(1,4);
-			addChild(bird);
+			gamePanel.addChild(bird);
 			
 			nimbus = new Nimbus();
 //			nimbus.color = bird.color;
@@ -199,17 +221,22 @@ package cn.sftech.www.view
 			scoreNum.y = 15;
 			scoreBar.addChild(scoreNum);
 			
-			menuBtn = new MenuBtn();
-			menuBtn.x = 725;
-			menuBtn.y = 405;
-			addChild(menuBtn);
-			
 			angry = new Angry();
 			angry.value = 0;
 			angry.x = 400;
 			angry.y = 440;
 			angry.addEventListener(MouseEvent.CLICK,makeSuperBird);
 			addChild(angry);
+			
+			pausingPage = new PausingPage();
+			pausingPage.visible = false;
+			addChild(pausingPage);
+			
+			menuBtn = new MenuBtn();
+			menuBtn.x = 725;
+			menuBtn.y = 405;
+			menuBtn.addEventListener(MouseEvent.CLICK,showMenuHandle);
+			addChild(menuBtn);
 			
 			this.addEventListener(MouseEvent.MOUSE_DOWN,mouseDownNimbusHandle);
 			
@@ -491,7 +518,7 @@ package cn.sftech.www.view
 			bullet.velocity = _currentBatchVelocity;
 			bullet.addEventListener(KillBulletEvent.KILL_BULLET_EVENT,killBullet);
 			bullet.addEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
-			addChild(bullet);
+			gamePanel.addChild(bullet);
 			_currentBulletArr.push(bullet);
 			
 			bulletCount ++;
@@ -531,7 +558,7 @@ package cn.sftech.www.view
 			coin.velocity = MathUtil.random(1,3);
 			coin.addEventListener(KillBulletEvent.KILL_BULLET_EVENT,killCoin);
 			coin.addEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
-			addChild(coin);
+			gamePanel.addChild(coin);
 			_currentBulletArr.push(coin);
 			setTimeout(createCoin,MathUtil.random(6,10)*1000);
 		}
@@ -567,6 +594,8 @@ package cn.sftech.www.view
 		//-----------------mouse event ---------------------
 		private function mouseDownNimbusHandle(event : MouseEvent) : void
 		{
+			if(isPauseing) return; //如果当期未暂停状态，则直接返回
+			
 			if(bird.body.hitTestPoint(this.mouseX,this.mouseY,true)) {
 				mouseDownFlag = true;
 			} else if(blood.hitTestPoint(this.mouseX,this.mouseY)) {
@@ -608,6 +637,20 @@ package cn.sftech.www.view
 				color ++;
 			}
 			nimbus.color = blood.color = bird.color = color;
+		}
+		
+		private function showMenuHandle(event : MouseEvent) : void
+		{
+			if(isPauseing) {
+				isPauseing = false;
+				pausingPage.visible = false;
+				_currentVelocity  = _oldVelocity;
+			} else {
+				_oldVelocity = _currentVelocity;
+				pausingPage.visible = true;
+				isPauseing = true;
+				_currentVelocity = 0;
+			}
 		}
 		
 		private function makeSuperBird(event : MouseEvent) : void
@@ -662,6 +705,9 @@ package cn.sftech.www.view
 					} else {
 						bird.hurt();
 						blood.blood--;
+						if(blood.blood == 0) {
+							gameOver();
+						}
 					}
 					bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 					bullet.killMyself();
@@ -723,7 +769,7 @@ package cn.sftech.www.view
 		
 		private function killBulletBase(bullet : BulletBase) : void
 		{
-			removeChild(bullet);
+			gamePanel.removeChild(bullet);
 			_currentBulletArr.splice(_currentBulletArr.indexOf(bullet),1);
 			bullet = null;
 			

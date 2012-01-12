@@ -2,10 +2,12 @@ package
 {
 	import cn.sftech.www.effect.base.SFEffectBase;
 	import cn.sftech.www.effect.viewStackEffect.SFViewStackGradientEffect;
+	import cn.sftech.www.event.ChangePageEvent;
 	import cn.sftech.www.event.SFInitializeDataEvent;
 	import cn.sftech.www.util.DataManager;
 	import cn.sftech.www.util.FPSViewer;
 	import cn.sftech.www.view.GamePage;
+	import cn.sftech.www.view.MainPage;
 	import cn.sftech.www.view.SFApplication;
 	import cn.sftech.www.view.SFLogo;
 	import cn.sftech.www.view.SFViewStack;
@@ -20,6 +22,8 @@ package
 	public class main extends SFApplication
 	{
 		private var vs : SFViewStack;
+		
+		private var mainPage : MainPage;
 		
 		private var gamePage : GamePage;
 		
@@ -101,9 +105,25 @@ package
 			vs.effect = vsEffect;
 			addChildAt(vs,0);
 			
+			mainPage = new MainPage();
+			mainPage.addEventListener(ChangePageEvent.CHANGE_PAGE_EVENT,changePageHandle);
+			vs.addItem(mainPage);
+			
+			mainPage.init();
+			
 			gamePage = new GamePage();
 			vs.addItem(gamePage);
-			gamePage.init();
+		}
+		
+		private function changePageHandle(event : ChangePageEvent) : void
+		{
+			if(event.data == ChangePageEvent.TO_MAIN_PAGE) {
+				mainPage.init();
+			} else if(event.data == ChangePageEvent.TO_GAME_PAGE) {
+				gamePage.init();
+			}
+			
+			vs.selectedIndex = event.data;
 		}
 	}
 }
