@@ -20,6 +20,8 @@ package cn.sftech.www.object
 		
 		public var _sector : uint = 90;
 		
+		private var _oldSector : uint;
+		
 		public function Nimbus()
 		{
 			super();
@@ -47,11 +49,13 @@ package cn.sftech.www.object
 		
 		public function set color(value : uint) : void
 		{
+			if(_color != 4) {
+				_oldSector = _sector;
+			}
 			_color = value;
 			
 			
 			if(_body) {
-				var _currentFrame : uint = _body.currentFrame;
 				removeChild(_body);
 			}
 			
@@ -70,7 +74,7 @@ package cn.sftech.www.object
 				}
 			}
 			
-			_body.gotoAndStop(_currentFrame);
+			sector = _oldSector;
 			
 			addChild(_body);
 		}
