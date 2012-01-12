@@ -73,6 +73,10 @@ package cn.sftech.www.view
 		 * 当前关卡数据
 		 */		
 		private var currentLvArr : Vector.<Object>;
+		/**
+		 * 超级状态下剩余的关卡数据
+		 */		
+		private var superStatusLvArr : Vector.<Object>;
 		
 		private var _model : ModelLocator = ModelLocator.getInstance();
 		
@@ -80,6 +84,10 @@ package cn.sftech.www.view
 		 * 当前关子剩余子弹数
 		 */		
 		private var _currentBulletCount : uint = 0;
+		/**
+		 * 当前子弹数组
+		 */		
+		private var _currentBulletArr : Vector.<BulletBase>;
 		/**
 		 * 子弹方向
 		 */		
@@ -105,6 +113,10 @@ package cn.sftech.www.view
 		 * 出现钱币锁
 		 */		
 		private var coinLock : Boolean = false;
+		/**
+		 * 出现子弹锁
+		 */		
+		private var bulletLock : Boolean = false;
 		
 		/**
 		 * 第一创建的颜色
@@ -114,6 +126,10 @@ package cn.sftech.www.view
 		 * 超级状态计时器
 		 */		
 		private var superTimer : Timer = new Timer(200,1);
+		/**
+		 * 是否以结束
+		 */		
+		private var isGameOver : Boolean = false;
 		
 		///////////////////////////////////////////////////////////////////////
 		
@@ -128,7 +144,11 @@ package cn.sftech.www.view
 		
 		private var _currentNimbusAngle : int = 180;
 		
-		private var _isAngry : Boolean = true;
+		private var _isAngry : Boolean = false;
+		/**
+		 * 当前是否是疯狂状态
+		 */		
+		private var _isSuperStatus : Boolean = false;
 		
 		/**
 		 * 当前界面上剩余未销毁子弹数
@@ -200,11 +220,18 @@ package cn.sftech.www.view
 		
 		private function initData() : void
 		{
+			isGameOver = false;
+			_currentBulletCount = 0;
+			_currentBulletArr = new Vector.<BulletBase>();
+			bulletLock = false;
 			blood.blood = GameConfig.TOTAL_BLOOD;
 			currentScore = 0;
-			_model.currentLv = 37;
+			_bulletCount = 0;
+			angry.value = 0;
+			_model.currentLv = 1;
 			_currentBatchQuadrant = MathUtil.random(1,5);
 			_currentBatchColor = bird.color;
+			_currentVelocity = 1;
 		}
 		
 		private function initUI() : void
@@ -280,20 +307,25 @@ package cn.sftech.www.view
 		
 		public function restartGame() : void
 		{
+			clearAllBulletBase();
 			initData();
 			
-			birdEffect.target = bird;
-			birdEffect.duration = 1;
-			birdEffect.vars = new TweenLiteVars();
-			birdEffect.vars.prop("y",240);
-			birdEffect.vars.prop("rotation",0);
-			birdEffect.vars.ease(Expo.easeIn);
-			birdEffect.vars.onComplete(
-				function createBirdHandle() : void
-				{
-					initLv();
-				});
-			birdEffect.play();
+			bird.y = 240;
+			bird.rotation = 0;
+			initLv();
+			
+//			birdEffect.target = bird;
+//			birdEffect.duration = 1;
+//			birdEffect.vars = new TweenLiteVars();
+//			birdEffect.vars.prop("y",240);
+//			birdEffect.vars.prop("rotation",0);
+//			birdEffect.vars.ease(Expo.easeIn);
+//			birdEffect.vars.onComplete(
+//				function createBirdHandle() : void
+//				{
+//					initLv();
+//				});
+//			birdEffect.play();
 			
 			
 		}
@@ -334,11 +366,7 @@ package cn.sftech.www.view
 		{
 			trace(value);
 			_bulletCount = value;
-			if(value == 0) {
-				if(currentLvArr.length == 0) {
-					successLv();
-				}
-			}
+			checkSuccess();
 		}
 		
 		private function get bulletCount() : int
@@ -348,6 +376,7 @@ package cn.sftech.www.view
 		
 		private function gameOver() : void
 		{
+			isGameOver = true;
 			coinLock = false;
 			
 			this.dispatchEvent(new GameOverEvent());
@@ -358,6 +387,10 @@ package cn.sftech.www.view
 			birdEffect.vars.prop("y",this.height + 100);
 			birdEffect.vars.prop("rotation",MathUtil.random(30,50));
 			birdEffect.vars.ease(Expo.easeIn);
+			birdEffect.vars.onComplete(function effectComplete() : void
+			{
+				_currentVelocity = 10;
+			});
 			birdEffect.play();
 			
 			var dataManager : DataManager = new DataManager();
@@ -366,48 +399,61 @@ package cn.sftech.www.view
 			trace("gameOver");
 		}
 		
+		private function checkSuccess() : void
+		{
+			if(bulletCount == 0) {
+				if(currentLvArr.length == 0) {
+					if(superStatusLvArr) {
+						recoverNoramlBird();
+					} else {
+						successLv();
+					}
+				}
+			}
+		}
+		
 		private function successLv() : void
 		{
 			_model.currentLv ++;
 			this.dispatchEvent(new GameSuccessEvent());
 		}
 		
-		private function createCrazyBullet() : void
-		{
-			var levelData : LevelData = new LevelData();
-			currentLvArr = Vector.<Object>(levelData);
-			createBatch();
-		}
-		
 		private function createBatch() : void
 		{
-			if(currentLvArr != null) {
-				var currentBatch : Object = currentLvArr[0];
-				
-				_currentBulletCount = currentBatch.bulletCount;
-				_currentBatchVelocity = currentBatch.bulletVelocity;
-				_currentBatchTimer = currentBatch.batchTimer;
-				_currentBatchQuadrant = LevelData.getQuadrantByLast(_currentBatchQuadrant,currentBatch.bulletQuadrant);
-				
-				if(currentBatch.bulletColorType == 3) { //类型为钱币
-					_currentBatchType = Coin;
-				} else {
-					_currentBatchType = Bullet;
-					if(currentBatch.bulletColorType == 4) {
-						_currentBatchColor = MathUtil.random(1,4);
+			if(!bulletLock) {
+				bulletLock = true;
+			
+				if(currentLvArr != null) {
+					var currentBatch : Object = currentLvArr[0];
+					
+					_currentBulletCount = currentBatch.bulletCount;
+					_currentBatchVelocity = currentBatch.bulletVelocity;
+					_currentBatchTimer = currentBatch.batchTimer;
+					_currentBatchQuadrant = LevelData.getQuadrantByLast(_currentBatchQuadrant,currentBatch.bulletQuadrant);
+					
+					if(currentBatch.bulletColorType == 3) { //类型为钱币
+						_currentBatchType = Coin;
 					} else {
-						_currentBatchColor = LevelData.getColorByLast(_currentBatchColor,currentBatch.bulletColorType);
+						_currentBatchType = Bullet;
+						if(currentBatch.bulletColorType == 4) {
+							_currentBatchColor = MathUtil.random(1,4);
+						} else {
+							_currentBatchColor = LevelData.getColorByLast(_currentBatchColor,currentBatch.bulletColorType);
+						}
+						trace(_currentBatchColor  + " currentColor ");
 					}
-					trace(_currentBatchColor  + " currentColor ");
+					
 				}
 				
+				createBullet();
 			}
-			
-			createBullet();
 		}
 		
 		private function createBullet() : void
 		{
+			//如果游戏结束，直接返回
+			if(isGameOver) return;
+			
 			//临时标记正负
 			var tempFlag : uint = MathUtil.random(0,2);
 			
@@ -446,14 +492,17 @@ package cn.sftech.www.view
 			bullet.addEventListener(KillBulletEvent.KILL_BULLET_EVENT,killBullet);
 			bullet.addEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 			addChild(bullet);
-
+			_currentBulletArr.push(bullet);
+			
 			bulletCount ++;
-			_currentBulletCount --;
+			_currentBulletCount --;//test cover to int
 			
 			if(_currentBulletCount == 0) {
+				bulletLock = false;
 				if(currentLvArr) {
 					currentLvArr.splice(0,1);
 				}
+				
 				if(currentLvArr.length == 0) {
 					return;
 				} else {
@@ -466,6 +515,8 @@ package cn.sftech.www.view
 		
 		private function createCoin() : void
 		{
+			if(isGameOver) return;
+			
 			//临时标记正负
 			var tempFlag : uint = MathUtil.random(0,2);
 			var coin : Coin = new Coin();
@@ -481,6 +532,7 @@ package cn.sftech.www.view
 			coin.addEventListener(KillBulletEvent.KILL_BULLET_EVENT,killCoin);
 			coin.addEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 			addChild(coin);
+			_currentBulletArr.push(coin);
 			setTimeout(createCoin,MathUtil.random(6,10)*1000);
 		}
 		
@@ -503,6 +555,13 @@ package cn.sftech.www.view
 				}
 			}
 			return angle;
+		}
+		
+		private function clearAllBulletBase() : void
+		{
+			for each(var bulletBase : BulletBase in _currentBulletArr) {
+				killBulletBase(bulletBase);
+			}
 		}
 		
 		//-----------------mouse event ---------------------
@@ -554,20 +613,32 @@ package cn.sftech.www.view
 		private function makeSuperBird(event : MouseEvent) : void
 		{
 			if(_isAngry) {
-				bird.makeSuper();
-				if(!superTimer.hasEventListener(TimerEvent.TIMER_COMPLETE)) {
-					superTimer.addEventListener(TimerEvent.TIMER_COMPLETE,
-						function timerHandle(event : TimerEvent) : void
-						{
-							superTimer.removeEventListener(TimerEvent.TIMER_COMPLETE,timerHandle);
-							superTimer.stop();
-							bird.recoverNormal();
-						});
-					superTimer.start();
-				}
+				_isSuperStatus = true;
 				
-				_currentVelocity = 2;
+				bird.makeSuper();
+				superStatusLvArr = currentLvArr;
+				var levelData : LevelData = new LevelData();
+				currentLvArr = Vector.<Object>(levelData.crazeData);
+				_currentVelocity = 5;
 				angry.value = 0;
+				
+				createBatch();
+			}
+		}
+		
+		private function recoverNoramlBird() : void
+		{
+			currentLvArr = superStatusLvArr;
+			superStatusLvArr = null;
+			_isAngry = false;
+			_isSuperStatus = false;
+			_currentVelocity = 1;
+			bird.recoverNormal();
+			
+			if(currentLvArr.length == 0) {
+				checkSuccess();
+			} else {
+				createBatch();
 			}
 		}
 			
@@ -579,17 +650,22 @@ package cn.sftech.www.view
 			bullet.x += bullet.moveX*bullet.velocity*_currentVelocity;
 			bullet.y += bullet.moveY*bullet.velocity*_currentVelocity;
 			
-			if(bullet.hitTestObject(bird.body)) {
-				if(bullet is Coin) {
-					currentScore += GameConfig.COIN_SCORE;
-				} else {
-					bird.hurt();
-					blood.blood--;
-				}
-				bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
-				bullet.killMyself();
-			} else if(Point.distance(new Point(bullet.x ,bullet.y),new Point(bird.x,bird.y))<115) {
+			if(Point.distance(new Point(bullet.x ,bullet.y),new Point(bird.x,bird.y))<115) {
+				if(_isSuperStatus) {
+					bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
+					bullet.killMyself();
+				} else
 //				trace(getAngle(bullet.x,bullet.y));
+				if(bullet.hitTestObject(bird.body)) {
+					if(bullet is Coin) {
+						currentScore += GameConfig.COIN_SCORE;
+					} else {
+						bird.hurt();
+						blood.blood--;
+					}
+					bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
+					bullet.killMyself();
+				} else
 				if(getAngle(bullet.x,bullet.y) > _currentNimbusAngle - nimbus.sector/2 - 10 &&
 					getAngle(bullet.x,bullet.y) < _currentNimbusAngle + nimbus.sector/2 + 10) {
 					if(bullet is Coin) {
@@ -597,7 +673,7 @@ package cn.sftech.www.view
 						bullet.killMyself();
 					} else {
 						var _bullet : Bullet = bullet as Bullet;
-						if(_bullet.color == nimbus.color || _isAngry) {
+						if(_bullet.color == nimbus.color) {
 							currentScore += GameConfig.BULLET_SCORE;
 							bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 							bullet.killMyself();
@@ -611,7 +687,7 @@ package cn.sftech.www.view
 							}
 						}
 					}
-				} 
+				}
 			}
 			
 			var canDel : Boolean = false;
@@ -627,7 +703,7 @@ package cn.sftech.www.view
 			
 			if(canDel) {
 				bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
-				removeChild(bullet);
+				killBulletBase(bullet);
 				bullet = null;
 			}
 			
@@ -648,6 +724,7 @@ package cn.sftech.www.view
 		private function killBulletBase(bullet : BulletBase) : void
 		{
 			removeChild(bullet);
+			_currentBulletArr.splice(_currentBulletArr.indexOf(bullet),1);
 			bullet = null;
 			
 			System.gc();

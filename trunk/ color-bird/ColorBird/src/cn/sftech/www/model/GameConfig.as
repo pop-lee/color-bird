@@ -76,7 +76,7 @@ package cn.sftech.www.model
 		/**
 		 * 愤怒值满
 		 */		
-		public static const TOTAL_ANGRY : uint = 10;
+		public static const TOTAL_ANGRY : uint = 2;
 		
 		public function GameConfig()
 		{
