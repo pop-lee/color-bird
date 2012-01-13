@@ -21,15 +21,15 @@ package cn.sftech.www.view
 			addChild(mainPane);
 			
 			mainPane.startGameBtn.addEventListener(MouseEvent.CLICK,startGame);
-			mainPane.startGameBtn.addEventListener(MouseEvent.CLICK,helpGame);
-			mainPane.startGameBtn.addEventListener(MouseEvent.CLICK,exitGame);
+			mainPane.helpGameBtn.addEventListener(MouseEvent.CLICK,helpGame);
+			mainPane.exitBtn.addEventListener(MouseEvent.CLICK,exitGame);
 		}
 		
 		private function leave() : void
 		{
 			mainPane.startGameBtn.removeEventListener(MouseEvent.CLICK,startGame);
-			mainPane.startGameBtn.removeEventListener(MouseEvent.CLICK,helpGame);
-			mainPane.startGameBtn.removeEventListener(MouseEvent.CLICK,exitGame);
+			mainPane.helpGameBtn.removeEventListener(MouseEvent.CLICK,helpGame);
+			mainPane.exitBtn.removeEventListener(MouseEvent.CLICK,exitGame);
 			
 			removeChild(mainPane);
 			mainPane = null;

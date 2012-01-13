@@ -1,6 +1,9 @@
 package cn.sftech.www.model
 {
 	import flash.errors.IllegalOperationError;
+	import flash.events.Event;
+	import flash.media.Sound;
+	import flash.media.SoundChannel;
 
 	public class ModelLocator
 	{
@@ -11,6 +14,10 @@ package cn.sftech.www.model
 		public var currentMaxScore : uint;
 		
 		public var currentLv : uint;
+		
+		public var audioChannel : SoundChannel = new SoundChannel();
+		
+		public var musicChannel : SoundChannel = new SoundChannel();
 		
 		
 		public function ModelLocator()
@@ -23,6 +30,20 @@ package cn.sftech.www.model
 		public static function getInstance() : ModelLocator
 		{
 			return _model;
+		}
+		
+		public static function playAudioSound(obj : Sound) : void
+		{
+			_model.audioChannel = obj.play(0,0,_model.audioChannel.soundTransform);
+		}
+		
+		public static function playBGSound(event : Event=null) : void
+		{
+			_model.musicChannel.stop();
+			_model.musicChannel = (new BGSound()).play(0,0,_model.musicChannel.soundTransform);
+			if(!_model.musicChannel.hasEventListener(Event.SOUND_COMPLETE)) {
+				_model.musicChannel.addEventListener(Event.SOUND_COMPLETE,playBGSound);
+			}
 		}
 		
 	}

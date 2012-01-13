@@ -2,6 +2,7 @@ package cn.sftech.www.view
 {
 	import cn.sftech.www.effect.SFMoveEffect;
 	import cn.sftech.www.effect.base.SFEffectBase;
+	import cn.sftech.www.event.ChangePageEvent;
 	import cn.sftech.www.event.GameOverEvent;
 	import cn.sftech.www.event.GameSuccessEvent;
 	import cn.sftech.www.event.KillBulletEvent;
@@ -29,6 +30,7 @@ package cn.sftech.www.view
 	import flash.events.MouseEvent;
 	import flash.events.TimerEvent;
 	import flash.geom.Point;
+	import flash.media.SoundTransform;
 	import flash.system.System;
 	import flash.utils.Timer;
 	import flash.utils.setTimeout;
@@ -67,7 +69,7 @@ package cn.sftech.www.view
 		/**
 		 * 菜单按钮
 		 */		
-		private var menuBtn : MenuBtn;
+		private var menuBtn : Menu;
 		/**
 		 * 愤怒按钮
 		 */		
@@ -91,7 +93,7 @@ package cn.sftech.www.view
 		/**
 		 * 当前关子剩余子弹数
 		 */		
-		private var _currentBulletCount : uint = 0;
+		private var _currentBulletCount : int = 0;
 		/**
 		 * 当前子弹数组
 		 */		
@@ -143,6 +145,8 @@ package cn.sftech.www.view
 		 */		
 		private var isPauseing : Boolean = false;
 		
+		private var isMute : Boolean = false;
+		
 		///////////////////////////////////////////////////////////////////////
 		
 		/**
@@ -153,14 +157,9 @@ package cn.sftech.www.view
 		 * 当前全局速度
 		 */		
 		private var _currentVelocity : uint = 1;
-		/**
-		 * 用来存储暂停前的速度
-		 */		
-		private var _oldVelocity : uint = 1;
 		
 		private var _currentNimbusAngle : int = 180;
 		
-		private var _isAngry : Boolean = false;
 		/**
 		 * 当前是否是疯狂状态
 		 */		
@@ -232,10 +231,10 @@ package cn.sftech.www.view
 			pausingPage.visible = false;
 			addChild(pausingPage);
 			
-			menuBtn = new MenuBtn();
+			menuBtn = new Menu();
 			menuBtn.x = 725;
 			menuBtn.y = 405;
-			menuBtn.addEventListener(MouseEvent.CLICK,showMenuHandle);
+			menuBtn.menuBtn.addEventListener(MouseEvent.CLICK,showMenuHandle);
 			addChild(menuBtn);
 			
 			this.addEventListener(MouseEvent.MOUSE_DOWN,mouseDownNimbusHandle);
@@ -268,47 +267,47 @@ package cn.sftech.www.view
 			var background : GamePaneBackground = new GamePaneBackground();
 			reel.addChild(background);
 			
-			var reel2 : SFMovieClip = new SFMovieClip();
-			reel.addChild(reel2);
+//			var reel2 : SFMovieClip = new SFMovieClip();
+//			reel.addChild(reel2);
 			
-			var cloud2_1 : Cloud2 = new Cloud2();
-			var cloud2_2 : Cloud2 = new Cloud2();
-			cloud2_2.y = -cloud2_2.height;
-			reel2.addChild(cloud2_1);
-			reel2.addChild(cloud2_2);
+//			var cloud2_1 : Cloud2 = new Cloud2();
+//			var cloud2_2 : Cloud2 = new Cloud2();
+//			cloud2_2.y = -cloud2_2.height;
+//			reel2.addChild(cloud2_1);
+//			reel2.addChild(cloud2_2);
 			
 //			cloud2_1.addEventListener(Event.ENTER_FRAME,could2EnterFrameHandle);
 //			cloud2_2.addEventListener(Event.ENTER_FRAME,could2EnterFrameHandle);
 			
-			var reel1 : SFMovieClip = new SFMovieClip();
-			reel.addChild(reel1);
-			
-			var cloud1_1 : Cloud1 = new Cloud1();
-			var cloud1_2 : Cloud1 = new Cloud1();
-			cloud1_2.y = -cloud1_2.height;
-			reel1.addChild(cloud1_1);
-			reel1.addChild(cloud1_2);
+//			var reel1 : SFMovieClip = new SFMovieClip();
+//			reel.addChild(reel1);
+//			
+//			var cloud1_1 : Cloud1 = new Cloud1();
+//			var cloud1_2 : Cloud1 = new Cloud1();
+//			cloud1_2.y = -cloud1_2.height;
+//			reel1.addChild(cloud1_1);
+//			reel1.addChild(cloud1_2);
 			
 //			cloud1_1.addEventListener(Event.ENTER_FRAME,could1EnterFrameHandle);
 //			cloud1_2.addEventListener(Event.ENTER_FRAME,could1EnterFrameHandle);
 			
 		}
 		
-		private function could2EnterFrameHandle(event : Event) : void
-		{
-			event.currentTarget.y ++;
-			if(event.currentTarget.y == GameConfig.GAMEPANE_HEIGHT) {
-				event.currentTarget.y = -GameConfig.GAMEPANE_HEIGHT;
-			}
-		}
-		
-		private function could1EnterFrameHandle(event : Event) : void
-		{
-			event.currentTarget.y ++;
-			if(event.currentTarget.y == GameConfig.GAMEPANE_HEIGHT) {
-				event.currentTarget.y = -GameConfig.GAMEPANE_HEIGHT;
-			}
-		}
+//		private function could2EnterFrameHandle(event : Event) : void
+//		{
+//			event.currentTarget.y ++;
+//			if(event.currentTarget.y == GameConfig.GAMEPANE_HEIGHT) {
+//				event.currentTarget.y = -GameConfig.GAMEPANE_HEIGHT;
+//			}
+//		}
+//		
+//		private function could1EnterFrameHandle(event : Event) : void
+//		{
+//			event.currentTarget.y ++;
+//			if(event.currentTarget.y == GameConfig.GAMEPANE_HEIGHT) {
+//				event.currentTarget.y = -GameConfig.GAMEPANE_HEIGHT;
+//			}
+//		}
 		
 		public function initLv() : void
 		{
@@ -359,6 +358,8 @@ package cn.sftech.www.view
 		
 		private function set currentScore(value : uint) : void
 		{
+			if(isGameOver) return;
+			
 			_model.currentScore = value
 			while(scoreNum.numChildren>0) {
 				scoreNum.removeChildAt(0);
@@ -379,9 +380,6 @@ package cn.sftech.www.view
 		private function set currentBlood(value : int) : void
 		{
 			_currentBlood = value;
-			if(value == 0) {
-				gameOver();
-			}
 		}
 		
 		private function get currentBlood() : int
@@ -405,6 +403,9 @@ package cn.sftech.www.view
 		{
 			isGameOver = true;
 			coinLock = false;
+			angry.value = 0;
+			
+			ModelLocator.playAudioSound(new DeadBirdSound());
 			
 			this.dispatchEvent(new GameOverEvent());
 			
@@ -481,54 +482,56 @@ package cn.sftech.www.view
 			//如果游戏结束，直接返回
 			if(isGameOver) return;
 			
-			//临时标记正负
-			var tempFlag : uint = MathUtil.random(0,2);
-			
-			var bullet : BulletBase = new _currentBatchType();
-			
-			//设置坐标位置
-			switch(_currentBatchQuadrant) {
-				case 1:{ //第一象限
-					trace("第一象限");
-					bullet.x = GameConfig.GAMEPANE_WIDTH + bullet.width;
-					bullet.y = MathUtil.random(-GameConfig.GAMECENTER_Y,GameConfig.GAMECENTER_Y);
-				};break;
-				case 2:{ //第二象限
-					trace("第二象限");
-					bullet.x = GameConfig.GAMEPANE_WIDTH + bullet.width;
-					bullet.y = MathUtil.random(GameConfig.GAMECENTER_Y,GameConfig.GAMEPANE_HEIGHT + GameConfig.GAMECENTER_Y);
-				};break;
-				case 3:{ //第三象限
-					trace("第三象限");
-					bullet.x = -bullet.width;
-					bullet.y = MathUtil.random(GameConfig.GAMECENTER_Y,GameConfig.GAMEPANE_HEIGHT + GameConfig.GAMECENTER_Y);
-				};break;
-				case 4:{ //第四象限
-					trace("第四象限");
-					bullet.x = -bullet.width;
-					bullet.y = MathUtil.random(-GameConfig.GAMECENTER_Y,GameConfig.GAMECENTER_Y);
-				};break;
-			} 
-			//设置颜色
-			if(bullet is Bullet) {
-				(bullet as Bullet).color = _currentBatchColor;
+			if(!isPauseing) {
+				//临时标记正负
+				var tempFlag : uint = MathUtil.random(0,2);
+				
+				var bullet : BulletBase = new _currentBatchType();
+				
+				//设置坐标位置
+				switch(_currentBatchQuadrant) {
+					case 1:{ //第一象限
+						trace("第一象限");
+						bullet.x = GameConfig.GAMEPANE_WIDTH + bullet.width;
+						bullet.y = MathUtil.random(-GameConfig.GAMECENTER_Y,GameConfig.GAMECENTER_Y);
+					};break;
+					case 2:{ //第二象限
+						trace("第二象限");
+						bullet.x = GameConfig.GAMEPANE_WIDTH + bullet.width;
+						bullet.y = MathUtil.random(GameConfig.GAMECENTER_Y,GameConfig.GAMEPANE_HEIGHT + GameConfig.GAMECENTER_Y);
+					};break;
+					case 3:{ //第三象限
+						trace("第三象限");
+						bullet.x = -bullet.width;
+						bullet.y = MathUtil.random(GameConfig.GAMECENTER_Y,GameConfig.GAMEPANE_HEIGHT + GameConfig.GAMECENTER_Y);
+					};break;
+					case 4:{ //第四象限
+						trace("第四象限");
+						bullet.x = -bullet.width;
+						bullet.y = MathUtil.random(-GameConfig.GAMECENTER_Y,GameConfig.GAMECENTER_Y);
+					};break;
+				} 
+				//设置颜色
+				if(bullet is Bullet) {
+					(bullet as Bullet).color = _currentBatchColor;
+				}
+				bullet.ctanValue = (bird.y - bullet.y)/(bird.x - bullet.x);
+				bullet.angle = getAngle(bullet.x,bullet.y);
+				bullet.velocity = _currentBatchVelocity;
+				bullet.addEventListener(KillBulletEvent.KILL_BULLET_EVENT,killBullet);
+				bullet.addEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
+				gamePanel.addChild(bullet);
+				_currentBulletArr.push(bullet);
+				
+				bulletCount ++;
+				_currentBulletCount --;
 			}
-			bullet.ctanValue = (bird.y - bullet.y)/(bird.x - bullet.x);
-			bullet.angle = getAngle(bullet.x,bullet.y);
-			bullet.velocity = _currentBatchVelocity;
-			bullet.addEventListener(KillBulletEvent.KILL_BULLET_EVENT,killBullet);
-			bullet.addEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
-			gamePanel.addChild(bullet);
-			_currentBulletArr.push(bullet);
 			
-			bulletCount ++;
-			_currentBulletCount --;//test cover to int
-			
-			if(_currentBulletCount == 0) {
-				bulletLock = false;
+			if(_currentBulletCount <= 0) {
 				if(currentLvArr) {
 					currentLvArr.splice(0,1);
 				}
+				bulletLock = false;
 				
 				if(currentLvArr.length == 0) {
 					return;
@@ -546,20 +549,22 @@ package cn.sftech.www.view
 			
 			//临时标记正负
 			var tempFlag : uint = MathUtil.random(0,2);
-			var coin : Coin = new Coin();
-			if(tempFlag == 0) {
-				coin.x = -coin.width;
-			} else {
-				coin.x = this.width + coin.width;
+			if(!isPauseing) {
+				var coin : Coin = new Coin();
+				if(tempFlag == 0) {
+					coin.x = -coin.width;
+				} else {
+					coin.x = this.width + coin.width;
+				}
+				coin.y = MathUtil.random(0,this.height);
+				coin.ctanValue = (GameConfig.GAMECENTER_Y - coin.y)/(GameConfig.GAMECENTER_X - coin.x);
+				coin.angle = getAngle(coin.x,coin.y);
+				coin.velocity = MathUtil.random(2,4);
+				coin.addEventListener(KillBulletEvent.KILL_BULLET_EVENT,killCoin);
+				coin.addEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
+				gamePanel.addChild(coin);
+				_currentBulletArr.push(coin);
 			}
-			coin.y = MathUtil.random(0,this.height);
-			coin.ctanValue = (GameConfig.GAMECENTER_Y - coin.y)/(GameConfig.GAMECENTER_X - coin.x);
-			coin.angle = getAngle(coin.x,coin.y);
-			coin.velocity = MathUtil.random(1,3);
-			coin.addEventListener(KillBulletEvent.KILL_BULLET_EVENT,killCoin);
-			coin.addEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
-			gamePanel.addChild(coin);
-			_currentBulletArr.push(coin);
 			setTimeout(createCoin,MathUtil.random(6,10)*1000);
 		}
 		
@@ -630,6 +635,8 @@ package cn.sftech.www.view
 		 */		
 		private function changeColorHandle(event : MouseEvent = null) : void
 		{
+			if(_isSuperStatus) return;
+			
 			var color : uint = bird.color;
 			if(color == 3) {
 				color = 1;
@@ -639,23 +646,60 @@ package cn.sftech.www.view
 			nimbus.color = blood.color = bird.color = color;
 		}
 		
-		private function showMenuHandle(event : MouseEvent) : void
+		private function showMenuHandle(event : MouseEvent = null) : void
 		{
 			if(isPauseing) {
 				isPauseing = false;
 				pausingPage.visible = false;
-				_currentVelocity  = _oldVelocity;
+				if(_isSuperStatus) {
+					_currentVelocity = 5;
+				} else {
+					_currentVelocity = 1;
+				}
+				
+				menuBtn.exitGameBtn.removeEventListener(MouseEvent.CLICK,exitGame);
+				menuBtn.soundBtn.removeEventListener(MouseEvent.CLICK,soundHandle);
+				menuBtn.gotoAndStop(1);
+				
+				if(isGameOver) {
+					clearAllBulletBase();
+				}
 			} else {
-				_oldVelocity = _currentVelocity;
-				pausingPage.visible = true;
 				isPauseing = true;
+				pausingPage.visible = true;
 				_currentVelocity = 0;
+				
+				menuBtn.gotoAndStop(2);
+				
+				menuBtn.exitGameBtn.addEventListener(MouseEvent.CLICK,exitGame);
+				menuBtn.soundBtn.addEventListener(MouseEvent.CLICK,soundHandle);
 			}
+		}
+		
+		private function soundHandle(event : MouseEvent) : void
+		{
+			var soundTransform1 : SoundTransform = _model.audioChannel.soundTransform;
+			var soundTransform2 : SoundTransform = _model.musicChannel.soundTransform;
+			if(isMute) {
+				soundTransform1.volume = 1;
+				soundTransform2.volume = 1;
+				isMute = false;
+				menuBtn.soundBtn.gotoAndStop(1);
+			} else {
+				soundTransform1.volume = 0;
+				soundTransform2.volume = 0;
+				isMute = true;
+				menuBtn.soundBtn.gotoAndStop(2);
+			}
+			_model.audioChannel.soundTransform = soundTransform1;
+			_model.musicChannel.soundTransform = soundTransform2;
 		}
 		
 		private function makeSuperBird(event : MouseEvent) : void
 		{
-			if(_isAngry) {
+			if(angry.value == GameConfig.TOTAL_ANGRY && !isGameOver) {
+				ModelLocator.playAudioSound(new SuperBirdSound());
+				angry.value = 0;
 				_isSuperStatus = true;
 				
 				bird.makeSuper();
@@ -663,7 +707,6 @@ package cn.sftech.www.view
 				var levelData : LevelData = new LevelData();
 				currentLvArr = Vector.<Object>(levelData.crazeData);
 				_currentVelocity = 5;
-				angry.value = 0;
 				
 				createBatch();
 			}
@@ -673,7 +716,6 @@ package cn.sftech.www.view
 		{
 			currentLvArr = superStatusLvArr;
 			superStatusLvArr = null;
-			_isAngry = false;
 			_isSuperStatus = false;
 			_currentVelocity = 1;
 			bird.recoverNormal();
@@ -697,14 +739,23 @@ package cn.sftech.www.view
 				if(_isSuperStatus) {
 					bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 					bullet.killMyself();
+					if(bullet is Coin) {
+						(bullet as Coin).isGet = false;
+					} else {
+						currentScore += GameConfig.BULLET_SCORE;
+						ModelLocator.playAudioSound(new KillBulletSound());
+					}
 				} else
 //				trace(getAngle(bullet.x,bullet.y));
 				if(bullet.hitTestObject(bird.body)) {
 					if(bullet is Coin) {
+						(bullet as Coin).isGet = true;
 						currentScore += GameConfig.COIN_SCORE;
+						ModelLocator.playAudioSound(new GetCoinSound());
 					} else {
 						bird.hurt();
 						blood.blood--;
+						ModelLocator.playAudioSound(new HurtSound());
 						if(blood.blood == 0) {
 							gameOver();
 						}
@@ -715,20 +766,22 @@ package cn.sftech.www.view
 				if(getAngle(bullet.x,bullet.y) > _currentNimbusAngle - nimbus.sector/2 - 10 &&
 					getAngle(bullet.x,bullet.y) < _currentNimbusAngle + nimbus.sector/2 + 10) {
 					if(bullet is Coin) {
+						(bullet as Coin).isGet = false;
 						bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 						bullet.killMyself();
 					} else {
 						var _bullet : Bullet = bullet as Bullet;
 						if(_bullet.color == nimbus.color) {
 							currentScore += GameConfig.BULLET_SCORE;
+							ModelLocator.playAudioSound(new KillBulletSound());
 							bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 							bullet.killMyself();
 							
 							//变化怒气槽
-							if(!_isAngry) {
+							if(angry.value != GameConfig.TOTAL_ANGRY) {
 								angry.value ++;
 								if(angry.value == GameConfig.TOTAL_ANGRY) {
-									_isAngry = true;
+									angry.makeAngry();
 								}
 							}
 						}
@@ -769,11 +822,24 @@ package cn.sftech.www.view
 		
 		private function killBulletBase(bullet : BulletBase) : void
 		{
+			bullet.removeEventListener(KillBulletEvent.KILL_BULLET_EVENT,killBullet);
+			bullet.removeEventListener(Event.ENTER_FRAME,bulletEnterFrameHandle);
 			gamePanel.removeChild(bullet);
 			_currentBulletArr.splice(_currentBulletArr.indexOf(bullet),1);
 			bullet = null;
 			
 			System.gc();
+		}
+		
+		private function exitGame(event : MouseEvent) : void
+		{
+			isGameOver = true;
+			clearAllBulletBase();
+			showMenuHandle();
+			
+			var changePageEvent : ChangePageEvent = new ChangePageEvent();
+			changePageEvent.data = ChangePageEvent.TO_MAIN_PAGE;
+			this.dispatchEvent(changePageEvent);
 		}
 		
 	}
