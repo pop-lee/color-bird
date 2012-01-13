@@ -62,11 +62,11 @@ package cn.sftech.www.model
 		/**
 		 * 挡掉子弹得分
 		 */		
-		public static const BULLET_SCORE : uint = 100;
+		public static const BULLET_SCORE : uint = 10;
 		/**
 		 * 挡掉钱币得分
 		 */		
-		public static const COIN_SCORE : uint = 500;
+		public static const COIN_SCORE : uint = 50;
 		
 		public static const SECTOR_LV_LINE : uint = 8;
 		/**
@@ -76,7 +76,7 @@ package cn.sftech.www.model
 		/**
 		 * 愤怒值满
 		 */		
-		public static const TOTAL_ANGRY : uint = 2;
+		public static const TOTAL_ANGRY : uint = 30;
 		
 		public function GameConfig()
 		{

@@ -4,9 +4,11 @@ package
 	import cn.sftech.www.effect.viewStackEffect.SFViewStackGradientEffect;
 	import cn.sftech.www.event.ChangePageEvent;
 	import cn.sftech.www.event.SFInitializeDataEvent;
+	import cn.sftech.www.model.ModelLocator;
 	import cn.sftech.www.util.DataManager;
 	import cn.sftech.www.util.FPSViewer;
 	import cn.sftech.www.view.GamePage;
+	import cn.sftech.www.view.HelpPage;
 	import cn.sftech.www.view.MainPage;
 	import cn.sftech.www.view.SFApplication;
 	import cn.sftech.www.view.SFLogo;
@@ -27,9 +29,13 @@ package
 		
 		private var gamePage : GamePage;
 		
+		private var helpPage : HelpPage;
+		
 		private var initLock : Boolean = false;
 		
 		private var logo : SFLogo;
+		//是否第一次游戏标记		
+		private var firstFlag : Boolean = true;
 		
 		public function main()
 		{
@@ -60,8 +66,8 @@ package
 		{
 			var dataManager : DataManager = new DataManager();
 			SFApplication.application.addEventListener(SFInitializeDataEvent.INITIALIZE_DATA_EVENT,initializedData);
-//			dataManager.initData();
-			initializedData(new SFInitializeDataEvent());
+			dataManager.initData();
+//			initializedData(new SFInitializeDataEvent());
 		}
 		
 		private function initializedData(event : SFInitializeDataEvent) : void
@@ -94,6 +100,7 @@ package
 		private function initUI() : void
 		{
 			FPSViewer.showFPS();
+			ModelLocator.playBGSound();
 			
 			vs = new SFViewStack();
 			vs.percentWidth = this.width;
@@ -108,11 +115,15 @@ package
 			mainPage = new MainPage();
 			mainPage.addEventListener(ChangePageEvent.CHANGE_PAGE_EVENT,changePageHandle);
 			vs.addItem(mainPage);
-			
 			mainPage.init();
 			
 			gamePage = new GamePage();
+			gamePage.addEventListener(ChangePageEvent.CHANGE_PAGE_EVENT,changePageHandle);
 			vs.addItem(gamePage);
+			
+			helpPage = new HelpPage();
+			helpPage.addEventListener(ChangePageEvent.CHANGE_PAGE_EVENT,changePageHandle);
+			vs.addItem(helpPage);
 		}
 		
 		private function changePageHandle(event : ChangePageEvent) : void
@@ -120,7 +131,17 @@ package
 			if(event.data == ChangePageEvent.TO_MAIN_PAGE) {
 				mainPage.init();
 			} else if(event.data == ChangePageEvent.TO_GAME_PAGE) {
-				gamePage.init();
+				if(firstFlag) {
+					helpPage.toPage = ChangePageEvent.TO_GAME_PAGE;
+					event.data = ChangePageEvent.TO_HELP_PAGE;
+					helpPage.init();
+					firstFlag = false;
+				} else {
+					gamePage.init();
+				}
+			} else if(event.data == ChangePageEvent.TO_HELP_PAGE) {
+				helpPage.toPage = ChangePageEvent.TO_MAIN_PAGE;
+				helpPage.init();
 			}
 			
 			vs.selectedIndex = event.data;

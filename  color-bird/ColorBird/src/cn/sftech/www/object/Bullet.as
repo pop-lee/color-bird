@@ -52,5 +52,19 @@ package cn.sftech.www.object
 			return _color;
 		}
 		
+		override public function killMyself() : void
+		{
+			if(_body.hasEventListener(Event.ENTER_FRAME)) return;
+			_body.addEventListener(Event.ENTER_FRAME,
+				function bodyEnterFrame(event : Event) : void {
+					if(_body.currentFrame == _body.totalFrames) {
+						_body.removeEventListener(Event.ENTER_FRAME,bodyEnterFrame);
+						_body.parent.dispatchEvent(new KillBulletEvent());
+						return;
+					}
+					_body.nextFrame();
+				});
+		}
+		
 	}
 }

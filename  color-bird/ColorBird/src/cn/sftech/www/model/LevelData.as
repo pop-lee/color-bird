@@ -275,13 +275,13 @@ package cn.sftech.www.model
 		];
 		
 		public var crazeData : Array = [
-			{bulletCount : 3,bulletVelocity : 4,bulletColorType : 4,bulletQuadrant : 1,batchTimer : 0},
-			{bulletCount : 3,bulletVelocity : 4,bulletColorType : 4,bulletQuadrant : 3,batchTimer : 0},
-			{bulletCount : 3,bulletVelocity : 4,bulletColorType : 4,bulletQuadrant : 2,batchTimer : 0},
-			{bulletCount : 3,bulletVelocity : 4,bulletColorType : 4,bulletQuadrant : 3,batchTimer : 1000},
-			
-			{bulletCount : 3,bulletVelocity : 4,bulletColorType : 4,bulletQuadrant : 1,batchTimer : 0},
-			{bulletCount : 3,bulletVelocity : 4,bulletColorType : 4,bulletQuadrant : 3,batchTimer : 0},
+			{bulletCount : 2,bulletVelocity : 5,bulletColorType : 4,bulletQuadrant : 1,batchTimer : 0},
+			{bulletCount : 2,bulletVelocity : 5,bulletColorType : 4,bulletQuadrant : 3,batchTimer : 0},
+			{bulletCount : 2,bulletVelocity : 5,bulletColorType : 4,bulletQuadrant : 2,batchTimer : 0},
+			{bulletCount : 2,bulletVelocity : 5,bulletColorType : 4,bulletQuadrant : 1,batchTimer : 0},
+			{bulletCount : 2,bulletVelocity : 5,bulletColorType : 4,bulletQuadrant : 3,batchTimer : 0},
+			{bulletCount : 2,bulletVelocity : 5,bulletColorType : 4,bulletQuadrant : 2,batchTimer : 0},
+			{bulletCount : 1,bulletVelocity : 5,bulletColorType : 4,bulletQuadrant : 3,batchTimer : 1000},
 		]
 		
 		public function LevelData()
