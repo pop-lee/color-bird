@@ -266,9 +266,6 @@ package cn.sftech.www.model
 				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 800},
 				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 2,batchTimer : 800},
 				{bulletCount : 4,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 1000},
-				//temp
-				{bulletCount : 1,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 300000000},
-				{bulletCount : 1,bulletVelocity : 4,bulletColorType : 2,bulletQuadrant : 3,batchTimer : 300000000},
 				
 			],
 			

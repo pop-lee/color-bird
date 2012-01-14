@@ -145,8 +145,6 @@ package cn.sftech.www.view
 		 */		
 		private var isPauseing : Boolean = false;
 		
-		private var isMute : Boolean = false;
-		
 		///////////////////////////////////////////////////////////////////////
 		
 		/**
@@ -169,6 +167,11 @@ package cn.sftech.www.view
 		 * 当前界面上剩余未销毁子弹数
 		 */
 		private var _bulletCount : int = 0;
+		/**
+		 * 创建计时器
+		 */		
+//		private var _createTimer : Timer;
+		
 		// 标记鼠标是否按下
 		private var mouseDownFlag : Boolean = false;
 		// 游戏失败鸟的掉到屏幕下的效果
@@ -255,6 +258,7 @@ package cn.sftech.www.view
 			_bulletCount = 0;
 			angry.value = 0;
 			_model.currentLv = 1;
+			birdEffect.stop();
 			_currentBatchQuadrant = MathUtil.random(1,5);
 			_currentBatchColor = bird.color;
 			_currentVelocity = 1;
@@ -316,11 +320,9 @@ package cn.sftech.www.view
 			if(_model.currentLv-1 < levelData.lvData.length) {
 				currentLvArr = Vector.<Object>(levelData.lvData[_model.currentLv-1]);
 			} else if(_model.currentLv-1 < levelData.lvData.length*2) {
-				trace((_model.currentLv-1)%levelData.lvData.length);
 				nimbus.sector = 45;
 				currentLvArr = Vector.<Object>(levelData.lvData[(_model.currentLv-1)%levelData.lvData.length]);
 			} else {
-				trace(MathUtil.random(levelData.lvData.length-6,levelData.lvData.length-1));
 				currentLvArr = Vector.<Object>(levelData.lvData[MathUtil.random(levelData.lvData.length-6,levelData.lvData.length-1)]);
 			}
 			
@@ -352,7 +354,6 @@ package cn.sftech.www.view
 //					initLv();
 //				});
 //			birdEffect.play();
-			
 			
 		}
 		
@@ -404,6 +405,8 @@ package cn.sftech.www.view
 			isGameOver = true;
 			coinLock = false;
 			angry.value = 0;
+//			_createTimer.stop();
+//			_createTimer = null;
 			
 			ModelLocator.playAudioSound(new DeadBirdSound());
 			
@@ -536,9 +539,23 @@ package cn.sftech.www.view
 				if(currentLvArr.length == 0) {
 					return;
 				} else {
+//					_createTimer = new Timer(_currentBatchTimer,1);
+//					_createTimer.addEventListener(TimerEvent.TIMER_COMPLETE,
+//						function timerHandle(event : TimerEvent) : void
+//						{
+//							createBatch();
+//						});
+//					_createTimer.start();
 					setTimeout(createBatch,_currentBatchTimer);
 				}
 			} else {
+//				_createTimer = new Timer(GameConfig.BULLET_TIMER,1);
+//				_createTimer.addEventListener(TimerEvent.TIMER_COMPLETE,
+//					function timerHandle(event : TimerEvent) : void
+//					{
+//						createBullet();
+//					});
+//				_createTimer.start();
 				setTimeout(createBullet,GameConfig.BULLET_TIMER);
 			}
 		}
@@ -591,9 +608,10 @@ package cn.sftech.www.view
 		
 		private function clearAllBulletBase() : void
 		{
-			for each(var bulletBase : BulletBase in _currentBulletArr) {
-				killBulletBase(bulletBase);
+			while(_currentBulletArr.length>0) {
+				killBulletBase(_currentBulletArr[0]);
 			}
+			
 		}
 		
 		//-----------------mouse event ---------------------
@@ -670,6 +688,11 @@ package cn.sftech.www.view
 				_currentVelocity = 0;
 				
 				menuBtn.gotoAndStop(2);
+				if(_model.isMute) {
+					menuBtn.soundBtn.gotoAndStop(2);
+				} else {
+					menuBtn.soundBtn.gotoAndStop(1);
+				}
 				
 				menuBtn.exitGameBtn.addEventListener(MouseEvent.CLICK,exitGame);
 				menuBtn.soundBtn.addEventListener(MouseEvent.CLICK,soundHandle);
@@ -680,15 +703,15 @@ package cn.sftech.www.view
 		{
 			var soundTransform1 : SoundTransform = _model.audioChannel.soundTransform;
 			var soundTransform2 : SoundTransform = _model.musicChannel.soundTransform;
-			if(isMute) {
+			if(_model.isMute) {
 				soundTransform1.volume = 1;
 				soundTransform2.volume = 1;
-				isMute = false;
+				_model.isMute = false;
 				menuBtn.soundBtn.gotoAndStop(1);
 			} else {
 				soundTransform1.volume = 0;
 				soundTransform2.volume = 0;
-				isMute = true;
+				_model.isMute = true;
 				menuBtn.soundBtn.gotoAndStop(2);
 			}
 			_model.audioChannel.soundTransform = soundTransform1;
@@ -730,6 +753,7 @@ package cn.sftech.www.view
 		
 		private function bulletEnterFrameHandle(event : Event) : void
 		{
+//			if(isGameOver) return;
 			var bullet : BulletBase = event.target as BulletBase;
 //			trace(bullet.moveX + "    " + bullet.moveY);
 			bullet.x += bullet.moveX*bullet.velocity*_currentVelocity;

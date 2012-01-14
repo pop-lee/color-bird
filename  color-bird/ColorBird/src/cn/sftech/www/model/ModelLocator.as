@@ -15,6 +15,9 @@ package cn.sftech.www.model
 		
 		public var currentLv : uint;
 		
+		//是否静音
+		public var isMute : Boolean = false;
+		
 		public var audioChannel : SoundChannel = new SoundChannel();
 		
 		public var musicChannel : SoundChannel = new SoundChannel();

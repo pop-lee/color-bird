@@ -39,6 +39,11 @@ package cn.sftech.www.object
 			color = 1;
 		}
 		
+		override public function set y(value:Number):void
+		{
+			super.y = value;
+		}
+		
 		public function set color(value : uint) : void
 		{
 			if(_color != 4) {
