@@ -19,7 +19,7 @@ package
 	
 	import flash.events.Event;
 	import flash.utils.setTimeout;
-
+	
 	[SWF(width="800",height="480")]
 	public class main extends SFApplication
 	{
@@ -39,7 +39,6 @@ package
 		
 		public function main()
 		{
-			
 		}
 		
 		override protected function init():void
@@ -142,6 +141,9 @@ package
 			} else if(event.data == ChangePageEvent.TO_HELP_PAGE) {
 				helpPage.toPage = ChangePageEvent.TO_MAIN_PAGE;
 				helpPage.init();
+			} else if(event.data == ChangePageEvent.EXIT) {
+				MttService.exit();
+				return;
 			}
 			
 			vs.selectedIndex = event.data;

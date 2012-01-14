@@ -64,6 +64,13 @@ package cn.sftech.www.view
 					
 					gamePane.restartGame();
 				});
+			gameOverPane.exitGameBtn.addEventListener(MouseEvent.CLICK,
+				function exitHandle() : void
+				{
+					var changePageEvent : ChangePageEvent = new ChangePageEvent();
+					changePageEvent.data = ChangePageEvent.TO_MAIN_PAGE;
+					changePageHandle(changePageEvent);
+				});
 			addChild(gameOverPane);
 		}
 		
