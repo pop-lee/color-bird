@@ -6,7 +6,6 @@ package
 	import cn.sftech.www.event.SFInitializeDataEvent;
 	import cn.sftech.www.model.ModelLocator;
 	import cn.sftech.www.util.DataManager;
-	import cn.sftech.www.util.FPSViewer;
 	import cn.sftech.www.view.GamePage;
 	import cn.sftech.www.view.HelpPage;
 	import cn.sftech.www.view.MainPage;
@@ -33,7 +32,6 @@ package
 		
 		private var initLock : Boolean = false;
 		
-		private var logo : SFLogo;
 		//是否第一次游戏标记		
 		private var firstFlag : Boolean = true;
 		
@@ -98,7 +96,6 @@ package
 		
 		private function initUI() : void
 		{
-			FPSViewer.showFPS();
 			ModelLocator.playBGSound();
 			
 			vs = new SFViewStack();

@@ -390,7 +390,6 @@ package cn.sftech.www.view
 		
 		private function set bulletCount(value : int) : void
 		{
-			trace(value);
 			_bulletCount = value;
 			checkSuccess();
 		}
@@ -427,7 +426,6 @@ package cn.sftech.www.view
 			var dataManager : DataManager = new DataManager();
 			dataManager.saveScore();
 			
-			trace("gameOver");
 		}
 		
 		private function checkSuccess() : void
@@ -471,7 +469,6 @@ package cn.sftech.www.view
 						} else {
 							_currentBatchColor = LevelData.getColorByLast(_currentBatchColor,currentBatch.bulletColorType);
 						}
-						trace(_currentBatchColor  + " currentColor ");
 					}
 					
 				}
@@ -494,22 +491,18 @@ package cn.sftech.www.view
 				//设置坐标位置
 				switch(_currentBatchQuadrant) {
 					case 1:{ //第一象限
-						trace("第一象限");
 						bullet.x = GameConfig.GAMEPANE_WIDTH + bullet.width;
 						bullet.y = MathUtil.random(-GameConfig.GAMECENTER_Y,GameConfig.GAMECENTER_Y);
 					};break;
 					case 2:{ //第二象限
-						trace("第二象限");
 						bullet.x = GameConfig.GAMEPANE_WIDTH + bullet.width;
 						bullet.y = MathUtil.random(GameConfig.GAMECENTER_Y,GameConfig.GAMEPANE_HEIGHT + GameConfig.GAMECENTER_Y);
 					};break;
 					case 3:{ //第三象限
-						trace("第三象限");
 						bullet.x = -bullet.width;
 						bullet.y = MathUtil.random(GameConfig.GAMECENTER_Y,GameConfig.GAMEPANE_HEIGHT + GameConfig.GAMECENTER_Y);
 					};break;
 					case 4:{ //第四象限
-						trace("第四象限");
 						bullet.x = -bullet.width;
 						bullet.y = MathUtil.random(-GameConfig.GAMECENTER_Y,GameConfig.GAMECENTER_Y);
 					};break;

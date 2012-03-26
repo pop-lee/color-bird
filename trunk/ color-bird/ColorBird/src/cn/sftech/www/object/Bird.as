@@ -5,7 +5,6 @@ package cn.sftech.www.object
 	import flash.display.MovieClip;
 	import flash.events.Event;
 	import flash.events.TimerEvent;
-	import flash.filters.GlowFilter;
 	import flash.utils.Timer;
 	
 	public class Bird extends SFMovieClip
